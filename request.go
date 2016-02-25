@@ -9,8 +9,8 @@ type Request struct {
 	RawRequest        *http.Request
 	RawResponseWriter http.ResponseWriter
 
-	// stored the extra info from middlewares
-	Extra map[string]interface{}
+	// stored the context info from middlewares
+	Context map[string]interface{}
 
 	Header http.Header
 	Method string
