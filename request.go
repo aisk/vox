@@ -1,4 +1,4 @@
-package gibson
+package vox
 
 import (
 	"net/http"

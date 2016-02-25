@@ -1,4 +1,4 @@
-package gibson
+package vox
 
 type Handler func(*Request) *Response
 
