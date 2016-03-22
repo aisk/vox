@@ -33,10 +33,15 @@ func NewResponse(content interface{}, args ...interface{}) *Response {
 		res.Content = []byte(c.String())
 	}
 
+	if len(args) == 0 {
+		res.Header = make(map[string]string)
+	}
+
 	if len(args) == 1 {
 		switch arg := args[0].(type) {
 		case int:
 			res.StatusCode = arg
+			res.Header = make(map[string]string)
 		case map[string]string:
 			res.Header = arg
 		}
@@ -45,15 +50,16 @@ func NewResponse(content interface{}, args ...interface{}) *Response {
 	if len(args) == 2 {
 		if statusCode, ok := args[0].(int); ok {
 			res.StatusCode = statusCode
+			res.Header = make(map[string]string)
 		} else if statusCode, ok := args[1].(int); ok {
 			res.StatusCode = statusCode
+			res.Header = make(map[string]string)
 		}
 		if header, ok := args[0].(map[string]string); ok {
 			res.Header = header
 		} else if header, ok := args[1].(map[string]string); ok {
 			res.Header = header
 		}
-
 	}
 
 	return res
@@ -62,6 +68,7 @@ func NewResponse(content interface{}, args ...interface{}) *Response {
 func NotFound(args ...string) *Response {
 	res := &Response{
 		StatusCode: 404,
+		Header:     make(map[string]string),
 	}
 	if len(args) == 0 {
 		res.Content = []byte("not found")

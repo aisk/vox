@@ -2,6 +2,7 @@ package vox
 
 import (
 	"net/http"
+	"regexp"
 )
 
 type Vox struct {
@@ -43,6 +44,16 @@ func (vox *Vox) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 }
 
 func (vox *Vox) Route(path string, handler Handler) {
+	// TODO: valid the path pattern
+	pathParamPattern := regexp.MustCompile(":\\w+")
+	matchPattern := regexp.MustCompile("^" + pathParamPattern.ReplaceAllString(path, "\\w+") + "$")
+
+	vox.Use(func(req *Request, next Next) *Response {
+		if !matchPattern.MatchString(req.URL.Path) {
+			return next()
+		}
+		return handler(req)
+	})
 }
 
 func (vox *Vox) Run(addr string) {

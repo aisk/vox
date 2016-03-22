@@ -73,3 +73,34 @@ func TestMiddlewaresOrder(t *testing.T) {
 		t.Error("wrong order")
 	}
 }
+
+func TestBasicRoute(t *testing.T) {
+	app := New()
+	app.Use(func(req *Request, next Next) *Response {
+		res := next()
+		res.Header["bar"] = "baz"
+		return res
+	})
+	app.Route("/:aaa/", func(req *Request) *Response {
+		return NewResponse("foo")
+	})
+	ts := httptest.NewServer(app)
+	defer ts.Close()
+
+	res, err := http.Get(ts.URL + "/hello/")
+	defer res.Body.Close()
+	if err != nil {
+		t.Error(err)
+	}
+	if res.StatusCode != 200 {
+		t.Error("wrong status code")
+	}
+	if res.Header.Get("bar") != "baz" {
+		t.Error("wrong header")
+	}
+	content, _ := ioutil.ReadAll(res.Body)
+	if string(content) != "foo" {
+		t.Error("wrong response body")
+	}
+
+}
