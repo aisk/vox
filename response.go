@@ -63,7 +63,7 @@ func NotFound(args ...string) *Response {
 	res := &Response{
 		StatusCode: 404,
 	}
-	if len(args) == 1 {
+	if len(args) == 0 {
 		res.Content = []byte("not found")
 	}
 	return res

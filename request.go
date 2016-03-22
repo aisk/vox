@@ -17,7 +17,7 @@ type Request struct {
 	URL    *url.URL
 }
 
-func NewRequest(rw http.ResponseWriter, rq *http.Request) *Request {
+func newRequest(rw http.ResponseWriter, rq *http.Request) *Request {
 	req := &Request{
 		RawRequest:        rq,
 		RawResponseWriter: rw,
