@@ -5,26 +5,19 @@ import (
 	"net/url"
 )
 
+// A Request stores current HTTP request's infomation.
 type Request struct {
-	RawRequest        *http.Request
-	RawResponseWriter http.ResponseWriter
-
-	// stored the context info from middlewares
-	Context map[string]interface{}
-
-	Header http.Header
-	Method string
-	URL    *url.URL
+	Request *http.Request
+	Header  http.Header
+	Method  string
+	URL     *url.URL
 }
 
-func newRequest(rw http.ResponseWriter, rq *http.Request) *Request {
-	req := &Request{
-		RawRequest:        rq,
-		RawResponseWriter: rw,
-
-		Method: rq.Method,
-		URL:    rq.URL,
-		Header: rq.Header,
+func createRequest(raw *http.Request) *Request {
+	return &Request{
+		Request: raw,
+		Header:  raw.Header,
+		Method:  raw.Method,
+		URL:     raw.URL,
 	}
-	return req
 }
