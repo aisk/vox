@@ -33,9 +33,23 @@ func (app *Application) Use(fn interface{}) {
 }
 
 func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
-	ctx := createContext(rq, rw)
+	ctx := app.createContext(rq, rw)
 	app.fn(ctx)
-	rw.Write([]byte("ok"))
+	respond(ctx)
+}
+
+func (app *Application) createContext(rq *http.Request, rw http.ResponseWriter) *Context {
+	ctx := &Context{
+		Request: createRequest(rq),
+		Response: &Response{
+			Status:  404,
+			Headers: rw.Header(),
+		},
+		Req: rq,
+		Res: rw,
+		App: app,
+	}
+	return ctx
 }
 
 // Route will register a new path handler to a given path.
@@ -61,5 +75,15 @@ func compose(middlewares []func(*Context, func())) func(*Context) {
 			}(i)
 		}
 		nexts[0]()
+	}
+}
+
+func respond(ctx *Context) {
+	ctx.Res.WriteHeader(ctx.Response.Status)
+	switch v := ctx.Response.Body.(type) {
+	case []byte:
+		ctx.Res.Write(v)
+	case string:
+		ctx.Res.Write([]byte(v))
 	}
 }

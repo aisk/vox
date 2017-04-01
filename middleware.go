@@ -1,5 +1,5 @@
 package vox
 
-type Next func() *Response
+type Next func()
 
 type MiddleWare func(*Request, Next) *Response
