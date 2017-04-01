@@ -7,6 +7,7 @@ import (
 // Application is type of an vox application.
 type Application struct {
 	middlewares []func(*Context, func())
+	fn          func(*Context)
 }
 
 // New returns a new vox Application.
@@ -33,9 +34,7 @@ func (app *Application) Use(fn interface{}) {
 
 func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	ctx := createContext(rq, rw)
-	for _, middleware := range app.middlewares {
-		middleware(ctx, func() {})
-	}
+	app.fn(ctx)
 	rw.Write([]byte("ok"))
 }
 
@@ -45,5 +44,22 @@ func (app *Application) Route(path string) {
 
 // Run the Vox application.
 func (app *Application) Run(addr string) {
+	app.fn = compose(app.middlewares)
 	http.ListenAndServe(addr, app)
+}
+
+func compose(middlewares []func(*Context, func())) func(*Context) {
+	return func(ctx *Context) {
+		length := len(middlewares)
+		nexts := make([]func(), length+1)
+		nexts[length] = func() {}
+		for i := length; i > 0; i-- {
+			func(j int) {
+				nexts[j-1] = func() {
+					middlewares[j-1](ctx, nexts[j])
+				}
+			}(i)
+		}
+		nexts[0]()
+	}
 }
