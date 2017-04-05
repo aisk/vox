@@ -33,6 +33,7 @@ func (app *Application) Use(fn interface{}) {
 }
 
 func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
+	app.fn = compose(app.middlewares)
 	ctx := app.createContext(rq, rw)
 	app.fn(ctx)
 	respond(ctx)
@@ -58,7 +59,6 @@ func (app *Application) Route(path string) {
 
 // Run the Vox application.
 func (app *Application) Run(addr string) {
-	app.fn = compose(app.middlewares)
 	http.ListenAndServe(addr, app)
 }
 
@@ -85,5 +85,9 @@ func respond(ctx *Context) {
 		ctx.Res.Write(v)
 	case string:
 		ctx.Res.Write([]byte(v))
+	case nil:
+		ctx.Res.Write(nil)
+	default:
+		panic("not implemented yed")
 	}
 }
