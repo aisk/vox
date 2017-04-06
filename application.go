@@ -1,6 +1,7 @@
 package vox
 
 import (
+	"encoding/json"
 	"net/http"
 )
 
@@ -41,14 +42,11 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 
 func (app *Application) createContext(rq *http.Request, rw http.ResponseWriter) *Context {
 	ctx := &Context{
-		Request: createRequest(rq),
-		Response: &Response{
-			Status:  404,
-			Headers: rw.Header(),
-		},
-		Req: rq,
-		Res: rw,
-		App: app,
+		Request:  createRequest(rq),
+		Response: createResponse(rw),
+		Req:      rq,
+		Res:      rw,
+		App:      app,
 	}
 	return ctx
 }
@@ -87,6 +85,12 @@ func respond(ctx *Context) {
 		ctx.Res.Write([]byte(v))
 	case nil:
 		ctx.Res.Write(nil)
+	case map[interface{}]interface{}:
+		body, err := json.Marshal(v)
+		if err != nil {
+			panic(err)
+		}
+		ctx.Res.Write(body)
 	default:
 		panic("not implemented yed")
 	}

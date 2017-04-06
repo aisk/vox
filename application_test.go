@@ -19,9 +19,15 @@ func TestEmptyApplication(t *testing.T) {
 func TestBasicApplication(t *testing.T) {
 	app := New()
 	app.Use(func(ctx *Context) {
+		if ctx.Request.Method != "GET" {
+			t.Fail()
+		}
+		if ctx.Request.URL.String() != "http://test.com/" {
+			t.Fail()
+		}
 		ctx.Response.Status = 200
 		ctx.Response.Body = "Hello Vox!"
-		ctx.Response.Headers.Set("foo", "bar")
+		ctx.Response.Header.Set("foo", "bar")
 	})
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
 	w := httptest.NewRecorder()
