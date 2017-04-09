@@ -25,8 +25,8 @@ func TestBasicApplication(t *testing.T) {
 		if ctx.Request.URL.String() != "http://test.com/" {
 			t.Fail()
 		}
-		ctx.Response.Status = 200
-		ctx.Response.Body = "Hello Vox!"
+		ctx.Response.SetStatus(200)
+		ctx.Response.SetBody("Hello Vox!")
 		ctx.Response.Header.Set("foo", "bar")
 	})
 	r := httptest.NewRequest("GET", "http://test.com/", nil)

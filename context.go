@@ -11,4 +11,5 @@ type Context struct {
 	App      *Application
 	Req      *http.Request
 	Res      http.ResponseWriter
+	State    map[string]interface{}
 }

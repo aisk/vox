@@ -37,7 +37,7 @@ func main() {
 
 	// response
 	app.Use(func(ctx *vox.Context) {
-		ctx.Response.Body = "Hello World"
+		ctx.Response.SetBody("Hello World")
 	})
 
 	app.Run(":3000")
