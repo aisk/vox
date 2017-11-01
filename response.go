@@ -18,6 +18,9 @@ type Response struct {
 
 // Body is the response's body getter
 func (response *Response) Body() interface{} {
+	if response.body == nil {
+		return "Not found"
+	}
 	return response.body
 }
 
