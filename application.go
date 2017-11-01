@@ -51,10 +51,6 @@ func (app *Application) createContext(rq *http.Request, rw http.ResponseWriter) 
 	return ctx
 }
 
-// Route will register a new path handler to a given path.
-func (app *Application) Route(path string) {
-}
-
 // Run the Vox application.
 func (app *Application) Run(addr string) {
 	http.ListenAndServe(addr, app)
