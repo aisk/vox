@@ -11,6 +11,7 @@ type Request struct {
 	Header  http.Header
 	Method  string
 	URL     *url.URL
+	Params  map[string]string
 }
 
 func createRequest(raw *http.Request) *Request {
@@ -19,5 +20,6 @@ func createRequest(raw *http.Request) *Request {
 		Header:  raw.Header,
 		Method:  raw.Method,
 		URL:     raw.URL,
+		Params:  map[string]string{},
 	}
 }

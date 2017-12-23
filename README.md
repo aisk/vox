@@ -16,6 +16,7 @@ package main
 import (
 	"fmt"
 	"time"
+	"regexp"
 
 	"github.com/aisk/vox"
 )
@@ -40,6 +41,11 @@ func main() {
 	// response
 	app.Get(func(ctx *vox.Context) {
 		ctx.Response.SetBody("Hello, World!")
+	})
+
+	// router param
+	app.Get(regexp.MustCompile(`/hello/(?P<name>\w+)`), func(ctx *vox.Context) {
+		ctx.Response.SetBody("Hello, " + ctx.Request.Params["name"] + "!")
 	})
 
 	app.Run(":3000")

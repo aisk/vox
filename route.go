@@ -10,7 +10,7 @@ func (app *Application) Route(method string, path *regexp.Regexp, fn interface{}
 	switch v := fn.(type) {
 	case func(*Context):
 		app.middlewares = append(app.middlewares, func(ctx *Context, next func()) {
-			if ctx.Request.Method == method && path.MatchString(ctx.Request.URL.Path) {
+			if match(ctx, method, path) {
 				v(ctx)
 				return
 			}
@@ -18,7 +18,7 @@ func (app *Application) Route(method string, path *regexp.Regexp, fn interface{}
 		})
 	case func(*Context, func()):
 		app.middlewares = append(app.middlewares, func(ctx *Context, next func()) {
-			if ctx.Request.Method == method && path.MatchString(ctx.Request.URL.Path) {
+			if match(ctx, method, path) {
 				v(ctx, next)
 				return
 			}
@@ -27,6 +27,24 @@ func (app *Application) Route(method string, path *regexp.Regexp, fn interface{}
 	default:
 		panic("invalid middleware function signature")
 	}
+}
+
+func match(ctx *Context, method string, path *regexp.Regexp) bool {
+	if ctx.Request.Method != method {
+		// TODO(asaka): ignore case?
+		return false
+	}
+	match := path.FindStringSubmatch(ctx.Request.URL.Path)
+	if match == nil {
+		return false
+	}
+	for i, name := range path.SubexpNames() {
+		if i == 0 || name == "" {
+			continue
+		}
+		ctx.Request.Params[name] = match[i]
+	}
+	return true
 }
 
 // Get register a new path handler for GET method
