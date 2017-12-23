@@ -38,14 +38,19 @@ func main() {
 		fmt.Printf("%s %s\n", ctx.Request.Method, ctx.Request.URL)
 	})
 
-	// response
-	app.Get(func(ctx *vox.Context) {
-		ctx.Response.SetBody("Hello, World!")
-	})
-
 	// router param
 	app.Get(regexp.MustCompile(`/hello/(?P<name>\w+)`), func(ctx *vox.Context) {
 		ctx.Response.SetBody("Hello, " + ctx.Request.Params["name"] + "!")
+	})
+
+	// response
+	app.Get(regexp.MustCompile("/"), func(ctx *vox.Context) {
+		// get the query string
+		name := ctx.Request.Query.Get("name")
+		if name == "" {
+			name = "World"
+		}
+		ctx.Response.SetBody("Hello, " + name + "!")
 	})
 
 	app.Run(":3000")

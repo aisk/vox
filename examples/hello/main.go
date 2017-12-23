@@ -32,7 +32,12 @@ func main() {
 
 	// response
 	app.Get(regexp.MustCompile("/"), func(ctx *vox.Context) {
-		ctx.Response.SetBody("Hello, World!")
+		// get the query string
+		name := ctx.Request.Query.Get("name")
+		if name == "" {
+			name = "World"
+		}
+		ctx.Response.SetBody("Hello, " + name + "!")
 	})
 
 	app.Run(":3000")
