@@ -2,12 +2,13 @@ package vox
 
 import (
 	"net/http/httptest"
+	"regexp"
 	"testing"
 )
 
 func TestRoute(t *testing.T) {
 	app := New()
-	app.Route("GET", "/test_route", func(ctx *Context) {
+	app.Route("GET", regexp.MustCompile("/test_route"), func(ctx *Context) {
 		ctx.Response.SetStatus(200)
 		ctx.Response.SetBody("Hello Vox!")
 		ctx.Response.Header.Set("foo", "bar")
