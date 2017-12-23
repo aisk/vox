@@ -2,7 +2,9 @@ package vox
 
 import (
 	"net/http/httptest"
+	"reflect"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -44,6 +46,48 @@ func TestRouteWithParams(t *testing.T) {
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, r)
 	if w.Result().StatusCode != 200 {
+		t.Fail()
+	}
+}
+
+func TestRouteShortcut(t *testing.T) {
+	methods := []string{"Get", "Post", "Put", "Delete", "Option"}
+
+	app := New()
+	for _, method := range methods {
+		args := []reflect.Value{}
+		args = append(args, reflect.ValueOf(regexp.MustCompile("/")))
+		args = append(args, reflect.ValueOf(func(ctx *Context) {
+			ctx.Response.SetBody(method)
+		}))
+		reflect.ValueOf(app).MethodByName(method).Call(args)
+	}
+
+	for _, method := range methods {
+		r := httptest.NewRequest(strings.ToUpper(method), "http://test.com/", nil)
+		w := httptest.NewRecorder()
+		app.ServeHTTP(w, r)
+		if w.Result().StatusCode != 200 && w.Body.String() != method {
+			t.Fail()
+		}
+
+	}
+
+}
+
+func TestRouteFallthrough(t *testing.T) {
+	app := New()
+	app.Get(regexp.MustCompile("/fallthrough"), func(ctx *Context, next func()) {
+		println("called!")
+		next()
+	})
+	app.Use(func(ctx *Context) {
+		ctx.Response.SetBody("fallthrough")
+	})
+	r := httptest.NewRequest("Get", "http://test.com/", nil)
+	w := httptest.NewRecorder()
+	app.ServeHTTP(w, r)
+	if w.Result().StatusCode != 200 && w.Body.String() != "fallthrough" {
 		t.Fail()
 	}
 }
