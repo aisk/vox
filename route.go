@@ -1,11 +1,20 @@
 package vox
 
+import (
+	"regexp"
+)
+
 // Route will register a new path handler to a given path.
 func (app *Application) Route(method string, path string, fn interface{}) {
+	reg, err := pathToRegexp(path)
+	if err != nil {
+		panic("compile path error:" + err.Error())
+	}
+
 	switch v := fn.(type) {
 	case func(*Context):
 		app.middlewares = append(app.middlewares, func(ctx *Context, next func()) {
-			if ctx.Request.Method == method && ctx.Request.URL.Path == path {
+			if ctx.Request.Method == method && reg.MatchString(ctx.Request.URL.Path) {
 				v(ctx)
 				return
 			}
@@ -13,7 +22,7 @@ func (app *Application) Route(method string, path string, fn interface{}) {
 		})
 	case func(*Context, func()):
 		app.middlewares = append(app.middlewares, func(ctx *Context, next func()) {
-			if ctx.Request.Method == method && ctx.Request.URL.Path == path {
+			if ctx.Request.Method == method && reg.MatchString(ctx.Request.URL.Path) {
 				v(ctx, next)
 				return
 			}
@@ -22,6 +31,11 @@ func (app *Application) Route(method string, path string, fn interface{}) {
 	default:
 		panic("invalid middleware function signature")
 	}
+}
+
+func pathToRegexp(path string) (*regexp.Regexp, error) {
+	// TODO(asaka): support parameters in path
+	return regexp.Compile(path)
 }
 
 // Get register a new path handler for GET method
