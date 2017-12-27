@@ -81,13 +81,12 @@ func respond(ctx *Context) {
 		ctx.Res.Write([]byte(v))
 	case nil:
 		ctx.Res.Write(nil)
-	case map[string]string, map[string]interface{}:
+	// case map[string]string, map[string]interface{}:
+	default:
 		body, err := json.Marshal(v)
 		if err != nil {
 			panic(err)
 		}
 		ctx.Res.Write(body)
-	default:
-		panic("not implemented yed")
 	}
 }

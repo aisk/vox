@@ -45,10 +45,9 @@ func (response *Response) SetBody(body interface{}) {
 		} else {
 			response.Header.Set("Content-Type", mime.TypeByExtension(".text"))
 		}
-	case map[string]interface{}, map[string]string:
-		response.Header.Set("Content-Type", mime.TypeByExtension(".json"))
+	// case map[string]interface{}, map[string]string:
 	default:
-		// TODO: suport more body types
+		response.Header.Set("Content-Type", mime.TypeByExtension(".json"))
 	}
 
 	response.body = body
