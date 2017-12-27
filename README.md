@@ -11,12 +11,13 @@ A golang web framework for humans, inspired by [Koa](http://koajs.com) heavily.
 ## Example
 
 ```go
+
 package main
 
 import (
 	"fmt"
-	"time"
 	"regexp"
+	"time"
 
 	"github.com/aisk/vox"
 )
@@ -40,7 +41,7 @@ func main() {
 
 	// router param
 	app.Get(regexp.MustCompile(`/hello/(?P<name>\w+)`), func(ctx *vox.Context) {
-		ctx.Response.SetBody("Hello, " + ctx.Request.Params["name"] + "!")
+		ctx.Response.Body = "Hello, " + ctx.Request.Params["name"] + "!"
 	})
 
 	// response
@@ -50,9 +51,11 @@ func main() {
 		if name == "" {
 			name = "World"
 		}
-		ctx.Response.SetBody("Hello, " + name + "!")
+		ctx.Response.Body = "Hello, " + name + "!"
 	})
 
 	app.Run(":3000")
 }
+
+
 ```

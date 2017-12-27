@@ -6,33 +6,44 @@ import (
 	"regexp"
 )
 
-var bodyMatcher = regexp.MustCompile("^\\s*<")
+var (
+	explictSetStatus = -1
+	explictSetBody   = &struct{}{}
 
-// A Response is for all infomation, which will write to ResponseWriter.
+	bodyMatcher = regexp.MustCompile("^\\s*<")
+)
+
+// A Response is all infomation for a request's response, which will write to ResponseWriter.
 type Response struct {
-	body           interface{}
-	explicitStatus bool
-	status         int
-	Header         http.Header
+	Body   interface{}
+	Status int
+	Header http.Header
 }
 
-// Body is the response's body getter
-func (response *Response) Body() interface{} {
-	if response.body == nil {
-		return "Not found"
+func (response *Response) setImplictStatus() {
+	if response.Status != explictSetStatus {
+		// response's status is set by user.
+		return
 	}
-	return response.body
+	if response.Body == explictSetBody {
+		// response's body is not set, set it to 404.
+		response.Status = 404
+		return
+	}
+	// response's status is not set by user, give it a default value.
+	response.Status = 200
 }
 
-// SetBody is the response's body getter
-func (response *Response) SetBody(body interface{}) {
-	if body == nil {
-		response.SetStatus(204)
+func (response *Response) setImplictContentType() {
+	if response.Header.Get("Content-Type") != "" {
+		return
 	}
-	if !response.explicitStatus {
-		response.SetStatus(200)
+
+	if response.Body == explictSetBody {
+		return
 	}
-	switch v := body.(type) {
+
+	switch v := response.Body.(type) {
 	case []byte:
 		if bodyMatcher.Match(v) {
 			response.Header.Set("Content-Type", mime.TypeByExtension(".html"))
@@ -49,25 +60,24 @@ func (response *Response) SetBody(body interface{}) {
 	default:
 		response.Header.Set("Content-Type", mime.TypeByExtension(".json"))
 	}
-
-	response.body = body
 }
 
-// Status returns the response's status code
-func (response *Response) Status() int {
-	return response.status
+func (response *Response) setImplictBody() {
+	if response.Body == explictSetBody {
+		response.Body = ""
+	}
 }
 
-// SetStatus is the response's status setter
-func (response *Response) SetStatus(code int) {
-	response.explicitStatus = true
-	response.status = code
+func (response *Response) setImplict() {
+	response.setImplictStatus()
+	response.setImplictContentType()
+	response.setImplictBody()
 }
 
 func createResponse(rw http.ResponseWriter) *Response {
 	return &Response{
-		status:         404,
-		explicitStatus: false,
-		Header:         rw.Header(),
+		Body:   explictSetBody,
+		Status: explictSetStatus,
+		Header: rw.Header(),
 	}
 }

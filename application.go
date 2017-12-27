@@ -62,14 +62,15 @@ func compose(middlewares []func(*Context, func())) func(*Context) {
 }
 
 func respond(ctx *Context) {
-	ctx.Res.WriteHeader(ctx.Response.Status())
-	switch v := ctx.Response.Body().(type) {
+	ctx.Response.setImplict()
+
+	ctx.Res.WriteHeader(ctx.Response.Status)
+
+	switch v := ctx.Response.Body.(type) {
 	case []byte:
 		ctx.Res.Write(v)
 	case string:
 		ctx.Res.Write([]byte(v))
-	case nil:
-		ctx.Res.Write(nil)
 	// case map[string]string, map[string]interface{}:
 	default:
 		body, err := json.Marshal(v)

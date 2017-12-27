@@ -27,7 +27,7 @@ func main() {
 
 	// router param
 	app.Get(regexp.MustCompile(`/hello/(?P<name>\w+)`), func(ctx *vox.Context) {
-		ctx.Response.SetBody("Hello, " + ctx.Request.Params["name"] + "!")
+		ctx.Response.Body = "Hello, " + ctx.Request.Params["name"] + "!"
 	})
 
 	// response
@@ -37,7 +37,7 @@ func main() {
 		if name == "" {
 			name = "World"
 		}
-		ctx.Response.SetBody("Hello, " + name + "!")
+		ctx.Response.Body = "Hello, " + name + "!"
 	})
 
 	app.Run(":3000")
