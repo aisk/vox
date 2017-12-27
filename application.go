@@ -40,17 +40,6 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	respond(ctx)
 }
 
-func (app *Application) createContext(rq *http.Request, rw http.ResponseWriter) *Context {
-	ctx := &Context{
-		Request:  createRequest(rq),
-		Response: createResponse(rw),
-		Req:      rq,
-		Res:      rw,
-		App:      app,
-	}
-	return ctx
-}
-
 // Run the Vox application.
 func (app *Application) Run(addr string) {
 	http.ListenAndServe(addr, app)
