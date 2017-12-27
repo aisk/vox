@@ -13,6 +13,7 @@ type Request struct {
 	URL     *url.URL
 	Query   url.Values
 	Params  map[string]string
+	Origin  string
 }
 
 func createRequest(raw *http.Request) *Request {
@@ -23,5 +24,6 @@ func createRequest(raw *http.Request) *Request {
 		URL:     raw.URL,
 		Query:   raw.URL.Query(),
 		Params:  map[string]string{},
+		Origin:  raw.Header.Get("Origin"),
 	}
 }
