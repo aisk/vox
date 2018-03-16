@@ -1,11 +1,13 @@
 package vox
 
 import (
+	"context"
 	"net/http"
 )
 
 // Context is a context through a HTTP request.
 type Context struct {
+	Context  context.Context
 	Request  *Request
 	Response *Response
 	App      *Application           // Vox application instance
@@ -17,6 +19,7 @@ type Context struct {
 
 func (app *Application) createContext(rq *http.Request, rw http.ResponseWriter) *Context {
 	ctx := &Context{
+		Context:  rq.Context(),
 		Request:  createRequest(rq),
 		Response: createResponse(rw),
 		App:      app,
