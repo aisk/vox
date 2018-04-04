@@ -3,14 +3,13 @@ package vox
 import (
 	"net/http/httptest"
 	"reflect"
-	"regexp"
 	"strings"
 	"testing"
 )
 
 func TestRoute(t *testing.T) {
 	app := New()
-	app.Route("GET", regexp.MustCompile("/test_route"), func(req *Request, res *Response) {
+	app.Route("GET", "/test_route", func(req *Request, res *Response) {
 		res.Body = "Hello Vox!"
 		res.Header.Set("foo", "bar")
 	})
@@ -31,7 +30,7 @@ func TestRoute(t *testing.T) {
 
 func TestRouteWithParams(t *testing.T) {
 	app := New()
-	app.Route("GET", regexp.MustCompile(`/(?P<first>\w+)/\w+/(?P<second>\w+)`), func(req *Request, res *Response) {
+	app.Route("GET", `/(?P<first>\w+)/\w+/(?P<second>\w+)`, func(req *Request, res *Response) {
 		res.Body = "Hello Vox!"
 		if req.Params["first"] != "foo" {
 			t.Fail()
@@ -54,7 +53,7 @@ func TestRouteShortcut(t *testing.T) {
 	app := New()
 	for _, method := range methods {
 		args := []reflect.Value{}
-		args = append(args, reflect.ValueOf(regexp.MustCompile("/")))
+		args = append(args, reflect.ValueOf("/"))
 		args = append(args, reflect.ValueOf(func(req *Request, res *Response) {
 			res.Body = method
 		}))
@@ -75,7 +74,7 @@ func TestRouteShortcut(t *testing.T) {
 
 func TestRouteFallthrough(t *testing.T) {
 	app := New()
-	app.Get(regexp.MustCompile("/fallthrough"), func(req *Request, res *Response) {
+	app.Get("/fallthrough", func(req *Request, res *Response) {
 	})
 	app.Use(func(req *Request, res *Response) {
 		res.Body = "fallthrough"

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/aisk/vox"
@@ -15,8 +14,8 @@ func main() {
 	app.Use(func(req *vox.Request, res *vox.Response) {
 		start := time.Now()
 		req.Next()
-		ms := time.Now().Sub(start).Seconds() / 1000
-		res.Header.Set("X-Response-Time", fmt.Sprintf("%fms", ms))
+		duration := time.Now().Sub(start)
+		res.Header.Set("X-Response-Time", fmt.Sprintf("%s", duration))
 	})
 
 	// logger
@@ -26,12 +25,12 @@ func main() {
 	})
 
 	// router param
-	app.Get(regexp.MustCompile(`/hello/(?P<name>\w+)`), func(req *vox.Request, res *vox.Response) {
+	app.Get(`/hello/(?P<name>\w+)`, func(req *vox.Request, res *vox.Response) {
 		res.Body = "Hello, " + req.Params["name"] + "!"
 	})
 
 	// response
-	app.Get(regexp.MustCompile("/"), func(req *vox.Request, res *vox.Response) {
+	app.Get("/", func(req *vox.Request, res *vox.Response) {
 		// get the query string
 		name := req.URL.Query().Get("name")
 		if name == "" {

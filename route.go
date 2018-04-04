@@ -5,10 +5,11 @@ import (
 )
 
 // Route will register a new path handler to a given path.
-func (app *Application) Route(method string, path *regexp.Regexp, handler Handler) {
+func (app *Application) Route(method string, path string, handler Handler) {
 	// TODO: support string based path
+	r := regexp.MustCompile(path)
 	app.middlewares = append(app.middlewares, func(req *Request, res *Response) {
-		if match(req, method, path) {
+		if match(req, method, r) {
 			handler(req, res)
 			return
 		}
@@ -35,26 +36,26 @@ func match(req *Request, method string, path *regexp.Regexp) bool {
 }
 
 // Get register a new path handler for GET method
-func (app *Application) Get(path *regexp.Regexp, handler Handler) {
+func (app *Application) Get(path string, handler Handler) {
 	app.Route("GET", path, handler)
 }
 
 // Post register a new path handler for GET method
-func (app *Application) Post(path *regexp.Regexp, handler Handler) {
+func (app *Application) Post(path string, handler Handler) {
 	app.Route("POST", path, handler)
 }
 
 // Put register a new path handler for GET method
-func (app *Application) Put(path *regexp.Regexp, handler Handler) {
+func (app *Application) Put(path string, handler Handler) {
 	app.Route("PUT", path, handler)
 }
 
 // Delete register a new path handler for GET method
-func (app *Application) Delete(path *regexp.Regexp, handler Handler) {
+func (app *Application) Delete(path string, handler Handler) {
 	app.Route("DELETE", path, handler)
 }
 
 // Option register a new path handler for GET method
-func (app *Application) Option(path *regexp.Regexp, handler Handler) {
+func (app *Application) Option(path string, handler Handler) {
 	app.Route("OPTION", path, handler)
 }
