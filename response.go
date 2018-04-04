@@ -15,6 +15,7 @@ var (
 
 // A Response is all infomation for a request's response, which will write to ResponseWriter.
 type Response struct {
+	Writer http.ResponseWriter
 	Body   interface{}
 	Status int
 	Header http.Header
@@ -76,6 +77,7 @@ func (response *Response) setImplict() {
 
 func createResponse(rw http.ResponseWriter) *Response {
 	return &Response{
+		Writer: rw,
 		Body:   explictSetBody,
 		Status: explictSetStatus,
 		Header: rw.Header(),

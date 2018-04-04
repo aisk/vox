@@ -12,32 +12,32 @@ func main() {
 	app := vox.New()
 
 	// x-response-time
-	app.Use(func(ctx *vox.Context, next func()) {
+	app.Use(func(req *vox.Request, res *vox.Response, next func()) {
 		start := time.Now()
 		next()
 		ms := time.Now().Sub(start).Seconds() / 1000
-		ctx.Response.Header.Set("X-Response-Time", fmt.Sprintf("%fms", ms))
+		res.Header.Set("X-Response-Time", fmt.Sprintf("%fms", ms))
 	})
 
 	// logger
-	app.Use(func(ctx *vox.Context, next func()) {
+	app.Use(func(req *vox.Request, res *vox.Response, next func()) {
 		next()
-		fmt.Printf("%s %s\n", ctx.Request.Method, ctx.Request.URL)
+		fmt.Printf("%s %s\n", req.Method, req.URL)
 	})
 
 	// router param
-	app.Get(regexp.MustCompile(`/hello/(?P<name>\w+)`), func(ctx *vox.Context) {
-		ctx.Response.Body = "Hello, " + ctx.Request.Params["name"] + "!"
+	app.Get(regexp.MustCompile(`/hello/(?P<name>\w+)`), func(req *vox.Request, res *vox.Response) {
+		res.Body = "Hello, " + req.Params["name"] + "!"
 	})
 
 	// response
-	app.Get(regexp.MustCompile("/"), func(ctx *vox.Context) {
+	app.Get(regexp.MustCompile("/"), func(req *vox.Request, res *vox.Response) {
 		// get the query string
-		name := ctx.Request.Query.Get("name")
+		name := req.URL.Query().Get("name")
 		if name == "" {
 			name = "World"
 		}
-		ctx.Response.Body = "Hello, " + name + "!"
+		res.Body = "Hello, " + name + "!"
 	})
 
 	app.Run(":3000")

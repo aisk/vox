@@ -7,8 +7,8 @@ import (
 
 // Application is type of an vox application.
 type Application struct {
-	middlewares []func(*Context, func())
-	fn          func(*Context)
+	middlewares []func(*Request, *Response, func())
+	fn          func(*Request, *Response)
 }
 
 // New returns a new vox Application.
@@ -20,13 +20,13 @@ func New() *Application {
 // Use a vox middleware.
 func (app *Application) Use(fn interface{}) {
 	switch v := fn.(type) {
-	case func(*Context):
-		app.middlewares = append(app.middlewares, func(ctx *Context, _ func()) {
-			v(ctx)
+	case func(*Request, *Response):
+		app.middlewares = append(app.middlewares, func(req *Request, res *Response, _ func()) {
+			v(req, res)
 		})
-	case func(*Context, func()):
-		app.middlewares = append(app.middlewares, func(ctx *Context, next func()) {
-			v(ctx, next)
+	case func(*Request, *Response, func()):
+		app.middlewares = append(app.middlewares, func(req *Request, res *Response, next func()) {
+			v(req, res, next)
 		})
 	default:
 		panic("invalid middleware function signature")
@@ -35,9 +35,10 @@ func (app *Application) Use(fn interface{}) {
 
 func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	app.fn = compose(app.middlewares)
-	ctx := app.createContext(rq, rw)
-	app.fn(ctx)
-	respond(ctx)
+	req := createRequest(rq)
+	res := createResponse(rw)
+	app.fn(req, res)
+	respond(res)
 }
 
 // Run the Vox application.
@@ -45,15 +46,15 @@ func (app *Application) Run(addr string) {
 	http.ListenAndServe(addr, app)
 }
 
-func compose(middlewares []func(*Context, func())) func(*Context) {
-	return func(ctx *Context) {
+func compose(middlewares []func(*Request, *Response, func())) func(*Request, *Response) {
+	return func(req *Request, res *Response) {
 		length := len(middlewares)
 		nexts := make([]func(), length+1)
 		nexts[length] = func() {}
 		for i := length; i > 0; i-- {
 			func(j int) {
 				nexts[j-1] = func() {
-					middlewares[j-1](ctx, nexts[j])
+					middlewares[j-1](req, res, nexts[j])
 				}
 			}(i)
 		}
@@ -61,22 +62,22 @@ func compose(middlewares []func(*Context, func())) func(*Context) {
 	}
 }
 
-func respond(ctx *Context) {
-	ctx.Response.setImplict()
+func respond(res *Response) {
+	res.setImplict()
 
-	ctx.Res.WriteHeader(ctx.Response.Status)
+	res.Writer.WriteHeader(res.Status)
 
-	switch v := ctx.Response.Body.(type) {
+	switch v := res.Body.(type) {
 	case []byte:
-		ctx.Res.Write(v)
+		res.Writer.Write(v)
 	case string:
-		ctx.Res.Write([]byte(v))
+		res.Writer.Write([]byte(v))
 	// case map[string]string, map[string]interface{}:
 	default:
 		body, err := json.Marshal(v)
 		if err != nil {
 			panic(err)
 		}
-		ctx.Res.Write(body)
+		res.Writer.Write(body)
 	}
 }

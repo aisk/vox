@@ -10,9 +10,9 @@ import (
 
 func TestRoute(t *testing.T) {
 	app := New()
-	app.Route("GET", regexp.MustCompile("/test_route"), func(ctx *Context) {
-		ctx.Response.Body = "Hello Vox!"
-		ctx.Response.Header.Set("foo", "bar")
+	app.Route("GET", regexp.MustCompile("/test_route"), func(req *Request, res *Response) {
+		res.Body = "Hello Vox!"
+		res.Header.Set("foo", "bar")
 	})
 	r := httptest.NewRequest("GET", "http://test.com/test_route", nil)
 	w := httptest.NewRecorder()
@@ -31,12 +31,12 @@ func TestRoute(t *testing.T) {
 
 func TestRouteWithParams(t *testing.T) {
 	app := New()
-	app.Route("GET", regexp.MustCompile(`/(?P<first>\w+)/\w+/(?P<second>\w+)`), func(ctx *Context) {
-		ctx.Response.Body = "Hello Vox!"
-		if ctx.Request.Params["first"] != "foo" {
+	app.Route("GET", regexp.MustCompile(`/(?P<first>\w+)/\w+/(?P<second>\w+)`), func(req *Request, res *Response) {
+		res.Body = "Hello Vox!"
+		if req.Params["first"] != "foo" {
 			t.Fail()
 		}
-		if ctx.Request.Params["second"] != "bar" {
+		if req.Params["second"] != "bar" {
 			t.Fail()
 		}
 	})
@@ -55,8 +55,8 @@ func TestRouteShortcut(t *testing.T) {
 	for _, method := range methods {
 		args := []reflect.Value{}
 		args = append(args, reflect.ValueOf(regexp.MustCompile("/")))
-		args = append(args, reflect.ValueOf(func(ctx *Context) {
-			ctx.Response.Body = method
+		args = append(args, reflect.ValueOf(func(req *Request, res *Response) {
+			res.Body = method
 		}))
 		reflect.ValueOf(app).MethodByName(method).Call(args)
 	}
@@ -75,12 +75,10 @@ func TestRouteShortcut(t *testing.T) {
 
 func TestRouteFallthrough(t *testing.T) {
 	app := New()
-	app.Get(regexp.MustCompile("/fallthrough"), func(ctx *Context, next func()) {
-		println("called!")
-		next()
+	app.Get(regexp.MustCompile("/fallthrough"), func(req *Request, res *Response, next func()) {
 	})
-	app.Use(func(ctx *Context) {
-		ctx.Response.Body = "fallthrough"
+	app.Use(func(req *Request, res *Response) {
+		res.Body = "fallthrough"
 	})
 	r := httptest.NewRequest("Get", "http://test.com/", nil)
 	w := httptest.NewRecorder()

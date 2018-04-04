@@ -8,18 +8,18 @@ import (
 func (app *Application) Route(method string, path *regexp.Regexp, fn interface{}) {
 	// TODO: support string based path
 	switch v := fn.(type) {
-	case func(*Context):
-		app.middlewares = append(app.middlewares, func(ctx *Context, next func()) {
-			if match(ctx, method, path) {
-				v(ctx)
+	case func(req *Request, res *Response):
+		app.middlewares = append(app.middlewares, func(req *Request, res *Response, next func()) {
+			if match(req, method, path) {
+				v(req, res)
 				return
 			}
 			next()
 		})
-	case func(*Context, func()):
-		app.middlewares = append(app.middlewares, func(ctx *Context, next func()) {
-			if match(ctx, method, path) {
-				v(ctx, next)
+	case func(req *Request, res *Response, next func()):
+		app.middlewares = append(app.middlewares, func(req *Request, res *Response, next func()) {
+			if match(req, method, path) {
+				v(req, res, next)
 				return
 			}
 			next()
@@ -29,12 +29,12 @@ func (app *Application) Route(method string, path *regexp.Regexp, fn interface{}
 	}
 }
 
-func match(ctx *Context, method string, path *regexp.Regexp) bool {
-	if ctx.Request.Method != method {
+func match(req *Request, method string, path *regexp.Regexp) bool {
+	if req.Method != method {
 		// TODO(asaka): ignore case?
 		return false
 	}
-	match := path.FindStringSubmatch(ctx.Request.URL.Path)
+	match := path.FindStringSubmatch(req.URL.Path)
 	if match == nil {
 		return false
 	}
@@ -42,7 +42,7 @@ func match(ctx *Context, method string, path *regexp.Regexp) bool {
 		if i == 0 || name == "" {
 			continue
 		}
-		ctx.Request.Params[name] = match[i]
+		req.Params[name] = match[i]
 	}
 	return true
 }
