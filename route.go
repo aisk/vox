@@ -5,28 +5,15 @@ import (
 )
 
 // Route will register a new path handler to a given path.
-func (app *Application) Route(method string, path *regexp.Regexp, fn interface{}) {
+func (app *Application) Route(method string, path *regexp.Regexp, handler Handler) {
 	// TODO: support string based path
-	switch v := fn.(type) {
-	case func(req *Request, res *Response):
-		app.middlewares = append(app.middlewares, func(req *Request, res *Response, next func()) {
-			if match(req, method, path) {
-				v(req, res)
-				return
-			}
-			next()
-		})
-	case func(req *Request, res *Response, next func()):
-		app.middlewares = append(app.middlewares, func(req *Request, res *Response, next func()) {
-			if match(req, method, path) {
-				v(req, res, next)
-				return
-			}
-			next()
-		})
-	default:
-		panic("invalid middleware function signature")
-	}
+	app.middlewares = append(app.middlewares, func(req *Request, res *Response) {
+		if match(req, method, path) {
+			handler(req, res)
+			return
+		}
+		req.Next()
+	})
 }
 
 func match(req *Request, method string, path *regexp.Regexp) bool {
@@ -48,26 +35,26 @@ func match(req *Request, method string, path *regexp.Regexp) bool {
 }
 
 // Get register a new path handler for GET method
-func (app *Application) Get(path *regexp.Regexp, fn interface{}) {
-	app.Route("GET", path, fn)
+func (app *Application) Get(path *regexp.Regexp, handler Handler) {
+	app.Route("GET", path, handler)
 }
 
 // Post register a new path handler for GET method
-func (app *Application) Post(path *regexp.Regexp, fn interface{}) {
-	app.Route("POST", path, fn)
+func (app *Application) Post(path *regexp.Regexp, handler Handler) {
+	app.Route("POST", path, handler)
 }
 
 // Put register a new path handler for GET method
-func (app *Application) Put(path *regexp.Regexp, fn interface{}) {
-	app.Route("PUT", path, fn)
+func (app *Application) Put(path *regexp.Regexp, handler Handler) {
+	app.Route("PUT", path, handler)
 }
 
 // Delete register a new path handler for GET method
-func (app *Application) Delete(path *regexp.Regexp, fn interface{}) {
-	app.Route("DELETE", path, fn)
+func (app *Application) Delete(path *regexp.Regexp, handler Handler) {
+	app.Route("DELETE", path, handler)
 }
 
 // Option register a new path handler for GET method
-func (app *Application) Option(path *regexp.Regexp, fn interface{}) {
-	app.Route("OPTION", path, fn)
+func (app *Application) Option(path *regexp.Regexp, handler Handler) {
+	app.Route("OPTION", path, handler)
 }

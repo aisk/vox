@@ -12,16 +12,16 @@ func main() {
 	app := vox.New()
 
 	// x-response-time
-	app.Use(func(req *vox.Request, res *vox.Response, next func()) {
+	app.Use(func(req *vox.Request, res *vox.Response) {
 		start := time.Now()
-		next()
+		req.Next()
 		ms := time.Now().Sub(start).Seconds() / 1000
 		res.Header.Set("X-Response-Time", fmt.Sprintf("%fms", ms))
 	})
 
 	// logger
-	app.Use(func(req *vox.Request, res *vox.Response, next func()) {
-		next()
+	app.Use(func(req *vox.Request, res *vox.Response) {
+		req.Next()
 		fmt.Printf("%s %s\n", req.Method, req.URL)
 	})
 

@@ -9,6 +9,7 @@ type Request struct {
 	*http.Request
 	Params map[string]string
 	State  map[string]interface{}
+	Next   func()
 }
 
 func createRequest(raw *http.Request) *Request {
@@ -16,5 +17,6 @@ func createRequest(raw *http.Request) *Request {
 		raw,
 		make(map[string]string),
 		make(map[string]interface{}),
+		nil,
 	}
 }

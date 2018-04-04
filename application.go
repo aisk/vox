@@ -7,8 +7,7 @@ import (
 
 // Application is type of an vox application.
 type Application struct {
-	middlewares []func(*Request, *Response, func())
-	fn          func(*Request, *Response)
+	middlewares []Handler
 }
 
 // New returns a new vox Application.
@@ -18,26 +17,15 @@ func New() *Application {
 }
 
 // Use a vox middleware.
-func (app *Application) Use(fn interface{}) {
-	switch v := fn.(type) {
-	case func(*Request, *Response):
-		app.middlewares = append(app.middlewares, func(req *Request, res *Response, _ func()) {
-			v(req, res)
-		})
-	case func(*Request, *Response, func()):
-		app.middlewares = append(app.middlewares, func(req *Request, res *Response, next func()) {
-			v(req, res, next)
-		})
-	default:
-		panic("invalid middleware function signature")
-	}
+func (app *Application) Use(handler Handler) {
+	app.middlewares = append(app.middlewares, handler)
 }
 
 func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
-	app.fn = compose(app.middlewares)
+	handler := compose(app.middlewares)
 	req := createRequest(rq)
 	res := createResponse(rw)
-	app.fn(req, res)
+	handler(req, res)
 	respond(res)
 }
 
@@ -46,7 +34,7 @@ func (app *Application) Run(addr string) {
 	http.ListenAndServe(addr, app)
 }
 
-func compose(middlewares []func(*Request, *Response, func())) func(*Request, *Response) {
+func compose(middlewares []Handler) Handler {
 	return func(req *Request, res *Response) {
 		length := len(middlewares)
 		nexts := make([]func(), length+1)
@@ -54,7 +42,8 @@ func compose(middlewares []func(*Request, *Response, func())) func(*Request, *Re
 		for i := length; i > 0; i-- {
 			func(j int) {
 				nexts[j-1] = func() {
-					middlewares[j-1](req, res, nexts[j])
+					req.Next = nexts[j]
+					middlewares[j-1](req, res)
 				}
 			}(i)
 		}

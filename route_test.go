@@ -75,7 +75,7 @@ func TestRouteShortcut(t *testing.T) {
 
 func TestRouteFallthrough(t *testing.T) {
 	app := New()
-	app.Get(regexp.MustCompile("/fallthrough"), func(req *Request, res *Response, next func()) {
+	app.Get(regexp.MustCompile("/fallthrough"), func(req *Request, res *Response) {
 	})
 	app.Use(func(req *Request, res *Response) {
 		res.Body = "fallthrough"
