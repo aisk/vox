@@ -30,8 +30,8 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 }
 
 // Run the Vox application.
-func (app *Application) Run(addr string) {
-	http.ListenAndServe(addr, app)
+func (app *Application) Run(addr string) error {
+	return http.ListenAndServe(addr, app)
 }
 
 func compose(middlewares []Handler) Handler {
