@@ -8,7 +8,7 @@ import (
 
 var (
 	explictSetStatus = -1
-	explictSetBody   = &struct{}{}
+	explictSetBody   = struct{}{}
 
 	bodyMatcher = regexp.MustCompile("^\\s*<")
 )
