@@ -7,7 +7,7 @@ import (
 // Route will register a new path handler to a given path.
 func (app *Application) Route(method string, path string, handler Handler) {
 	// TODO: support string based path
-	r := regexp.MustCompile(path)
+	r := routeToRegexp(path)
 	app.middlewares = append(app.middlewares, func(req *Request, res *Response) {
 		if match(req, method, r) {
 			handler(req, res)
@@ -58,4 +58,11 @@ func (app *Application) Delete(path string, handler Handler) {
 // Option register a new path handler for GET method
 func (app *Application) Option(path string, handler Handler) {
 	app.Route("OPTION", path, handler)
+}
+
+func routeToRegexp(path string) *regexp.Regexp {
+	replaced := regexp.MustCompile(`{(?P<param>\w+)}`).ReplaceAllStringFunc(path, func(s string) string {
+		return "(?P<" + s[1:len(s)-1] + ">\\w+)"
+	})
+	return regexp.MustCompile(replaced)
 }

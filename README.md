@@ -38,7 +38,7 @@ func main() {
 	})
 
 	// router param
-	app.Get(`/hello/(?P<name>\w+)`, func(req *vox.Request, res *vox.Response) {
+	app.Get(`/hello/{name}`, func(req *vox.Request, res *vox.Response) {
 		res.Body = "Hello, " + req.Params["name"] + "!"
 	})
 

@@ -86,3 +86,16 @@ func TestRouteFallthrough(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestRouteToRegexp(t *testing.T) {
+	fn := func(input, expect string) {
+		result := routeToRegexp(input)
+		if result.String() != expect {
+			t.Errorf("expect %s, got %s", expect, result)
+		}
+	}
+	fn("/xxx/foo", "/xxx/foo")
+	fn(`/xxx/(?P<name>\w+)`, `/xxx/(?P<name>\w+)`)
+	fn(`/xxx/{name}`, `/xxx/(?P<name>\w+)`)
+	fn(`/xxx/{name2}`, `/xxx/(?P<name2>\w+)`)
+}
