@@ -36,18 +36,16 @@ func (app *Application) Run(addr string) error {
 
 func compose(middlewares []Handler) Handler {
 	return func(req *Request, res *Response) {
-		length := len(middlewares)
-		nexts := make([]func(), length+1)
-		nexts[length] = func() {}
-		for i := length; i > 0; i-- {
-			func(j int) {
-				nexts[j-1] = func() {
-					req.Next = nexts[j]
-					middlewares[j-1](req, res)
+		next := func() {}
+		for i := len(middlewares) - 1; i >= 0; i-- {
+			func(i int, nenext func()) {
+				next = func() {
+					req.Next = nenext
+					middlewares[i](req, res)
 				}
-			}(i)
+			}(i, next)
 		}
-		nexts[0]()
+		next()
 	}
 }
 
