@@ -55,3 +55,9 @@ func main() {
 	app.Run(":3000")
 }
 ```
+
+---
+
+## License
+
+MIT
