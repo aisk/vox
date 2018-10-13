@@ -13,11 +13,18 @@ var (
 	bodyMatcher = regexp.MustCompile("^\\s*<")
 )
 
-// A Response is all infomation for a request's response, which will write to ResponseWriter.
+// A Response object contains all the infomation which will written to current
+// HTTP client.
 type Response struct {
+	// Writer is the raw http.ResponseWriter for current request. You should
+	// assign the Body / Status / Header value instead of using this field.
 	Writer http.ResponseWriter
-	Body   interface{}
+	// Body is the container for HTTP response's body.
+	Body interface{}
+	// The status code which will respond as the HTTP Response's status code.
+	// 200 will be used as the default value if not set.
 	Status int
+	// Headers which will be writen to the response.
 	Header http.Header
 }
 

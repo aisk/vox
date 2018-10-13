@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Application is type of an vox application.
+// An Application is a container which includes middlewares and config, and implemented the GO's net/http.Handler interface https://golang.org/pkg/net/http/#Handler.
 type Application struct {
 	middlewares []Handler
 }
@@ -59,7 +59,7 @@ func respond(res *Response) {
 		res.Writer.Write(v)
 	case string:
 		res.Writer.Write([]byte(v))
-	// case map[string]string, map[string]interface{}:
+	// TODO: support io.Reader type
 	default:
 		body, err := json.Marshal(v)
 		if err != nil {
