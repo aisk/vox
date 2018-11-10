@@ -6,7 +6,7 @@ import (
 
 // A Request object contains all the information from current HTTP client.
 //
-// Request embeded the current request's raw *http.Request as it's field, so you
+// Request embedded the current request's raw *http.Request as it's field, so you
 // can using all the fields and method of http.Request. see http://golang.org/pkg/net/http/#Request.
 type Request struct {
 	*http.Request

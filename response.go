@@ -13,7 +13,7 @@ var (
 	bodyMatcher = regexp.MustCompile("^\\s*<")
 )
 
-// A Response object contains all the infomation which will written to current
+// A Response object contains all the information which will written to current
 // HTTP client.
 type Response struct {
 	// Writer is the raw http.ResponseWriter for current request. You should
@@ -24,7 +24,7 @@ type Response struct {
 	// The status code which will respond as the HTTP Response's status code.
 	// 200 will be used as the default value if not set.
 	Status int
-	// Headers which will be writen to the response.
+	// Headers which will be written to the response.
 	Header http.Header
 }
 

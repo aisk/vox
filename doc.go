@@ -1,7 +1,7 @@
 /*
 Package vox is a golang web framework for humans, inspired by Koa http://koajs.com heavily.
 
-Indroduction
+Introduction
 
 Vox is a web framework inspired by Koa, which aims to be a minimal and elegent library for web applications.
 
