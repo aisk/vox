@@ -39,3 +39,19 @@ func TestNewResponse(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestRedirect(t *testing.T) {
+	app := New()
+	app.Use(func(req *Request, res *Response) {
+		res.Redirect("/new_location", 302)
+	})
+	r := httptest.NewRequest("GET", "http://test.com/", nil)
+	w := httptest.NewRecorder()
+	app.ServeHTTP(w, r)
+	if w.Result().StatusCode != 302 {
+		t.Fatal()
+	}
+	if w.HeaderMap.Get("Location") != "/new_location" {
+		t.Fatal()
+	}
+}

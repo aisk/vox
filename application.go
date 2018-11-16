@@ -25,6 +25,7 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	handler := compose(app.middlewares)
 	req := createRequest(rq)
 	res := createResponse(rw)
+	res.request = req
 	handler(req, res)
 	respond(res)
 }
