@@ -155,6 +155,13 @@ func (response *Response) Redirect(url string, code int) {
 	}
 }
 
+// SetCookie sets cookies on response.
+func (response *Response) SetCookie(cookie *http.Cookie) {
+	if v := cookie.String(); v != "" {
+		response.Header.Add("Set-Cookie", v)
+	}
+}
+
 func (response *Response) setImplictBody() {
 	if response.Body == explictSetBody {
 		response.Body = ""
