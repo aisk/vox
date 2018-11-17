@@ -29,7 +29,7 @@ func TestRoute(t *testing.T) {
 	}
 }
 
-func TestRouteMethod(t *testing.T) {
+func TestMatchAnyMethod(t *testing.T) {
 	app := New()
 	app.Route("*", "/test_route", func(req *Request, res *Response) {
 		res.Body = "matched!"
@@ -63,7 +63,17 @@ func TestRouteWithParams(t *testing.T) {
 }
 
 func TestRouteShortcut(t *testing.T) {
-	methods := []string{"Get", "Post", "Put", "Delete", "Option"}
+	methods := []string{
+		"Get",
+		"Head",
+		"Post",
+		"Put",
+		"Patch",
+		"Delete",
+		"Connect",
+		"Options",
+		"Trace",
+	}
 
 	app := New()
 	for _, method := range methods {
@@ -82,9 +92,7 @@ func TestRouteShortcut(t *testing.T) {
 		if w.Result().StatusCode != 200 && w.Body.String() != method {
 			t.Fail()
 		}
-
 	}
-
 }
 
 func TestRouteFallthrough(t *testing.T) {

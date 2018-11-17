@@ -35,29 +35,49 @@ func match(req *Request, method string, path *regexp.Regexp) bool {
 	return true
 }
 
-// Get register a new path handler for GET method
+// Get register a new path handler for GET method.
 func (app *Application) Get(path string, handler Handler) {
 	app.Route("GET", path, handler)
 }
 
-// Post register a new path handler for POST method
+// Head register a new path handler for HEAD method.
+func (app *Application) Head(path string, handler Handler) {
+	app.Route("HEAD", path, handler)
+}
+
+// Post register a new path handler for POST method.
 func (app *Application) Post(path string, handler Handler) {
 	app.Route("POST", path, handler)
 }
 
-// Put register a new path handler for PUT method
+// Put register a new path handler for PUT method.
 func (app *Application) Put(path string, handler Handler) {
 	app.Route("PUT", path, handler)
 }
 
-// Delete register a new path handler for DELETE method
+// Patch register a new path handler for PATCH method.
+func (app *Application) Patch(path string, handler Handler) {
+	app.Route("PATCH", path, handler)
+}
+
+// Delete register a new path handler for DELETE method.
 func (app *Application) Delete(path string, handler Handler) {
 	app.Route("DELETE", path, handler)
 }
 
-// Option register a new path handler for OPTION method
-func (app *Application) Option(path string, handler Handler) {
-	app.Route("OPTION", path, handler)
+// Connect register a new path handler for CONNECT method.
+func (app *Application) Connect(path string, handler Handler) {
+	app.Route("CONNECT", path, handler)
+}
+
+// Options register a new path handler for OPTIONS method.
+func (app *Application) Options(path string, handler Handler) {
+	app.Route("OPTIONS", path, handler)
+}
+
+// Trace register a new path handler for TRACE method.
+func (app *Application) Trace(path string, handler Handler) {
+	app.Route("TRACE", path, handler)
 }
 
 func routeToRegexp(path string) *regexp.Regexp {
