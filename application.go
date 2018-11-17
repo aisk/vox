@@ -51,7 +51,7 @@ func compose(middlewares []Handler) Handler {
 }
 
 func respond(res *Response) {
-	res.setImplict()
+	res.setImplicit()
 
 	res.Writer.WriteHeader(res.Status)
 

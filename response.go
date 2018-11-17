@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	explictSetStatus = -1
-	explictSetBody   = struct{}{}
+	explicitSetStatus = -1
+	explicitSetBody   = struct{}{}
 
 	bodyMatcher = regexp.MustCompile("^\\s*<")
 )
@@ -70,12 +70,12 @@ type Response struct {
 	Header http.Header
 }
 
-func (response *Response) setImplictStatus() {
-	if response.Status != explictSetStatus {
+func (response *Response) setImplicitStatus() {
+	if response.Status != explicitSetStatus {
 		// response's status is set by user.
 		return
 	}
-	if response.Body == explictSetBody {
+	if response.Body == explicitSetBody {
 		// response's body is not set, set it to 404.
 		response.Status = 404
 		return
@@ -84,12 +84,12 @@ func (response *Response) setImplictStatus() {
 	response.Status = 200
 }
 
-func (response *Response) setImplictContentType() {
+func (response *Response) setImplicitContentType() {
 	if response.Header.Get("Content-Type") != "" {
 		return
 	}
 
-	if response.Body == explictSetBody {
+	if response.Body == explicitSetBody {
 		return
 	}
 
@@ -162,23 +162,23 @@ func (response *Response) SetCookie(cookie *http.Cookie) {
 	}
 }
 
-func (response *Response) setImplictBody() {
-	if response.Body == explictSetBody {
+func (response *Response) setImplicitBody() {
+	if response.Body == explicitSetBody {
 		response.Body = http.StatusText(404)
 	}
 }
 
-func (response *Response) setImplict() {
-	response.setImplictStatus()
-	response.setImplictContentType()
-	response.setImplictBody()
+func (response *Response) setImplicit() {
+	response.setImplicitStatus()
+	response.setImplicitContentType()
+	response.setImplicitBody()
 }
 
 func createResponse(rw http.ResponseWriter) *Response {
 	return &Response{
 		Writer: rw,
-		Body:   explictSetBody,
-		Status: explictSetStatus,
+		Body:   explicitSetBody,
+		Status: explicitSetStatus,
 		Header: rw.Header(),
 	}
 }

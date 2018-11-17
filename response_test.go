@@ -9,7 +9,7 @@ import (
 func TestNewResponse(t *testing.T) {
 	w := httptest.NewRecorder()
 	response := createResponse(w)
-	response.setImplict()
+	response.setImplicit()
 	if response.Status != 404 {
 		t.Fail()
 	}
@@ -17,7 +17,7 @@ func TestNewResponse(t *testing.T) {
 	w = httptest.NewRecorder()
 	response = createResponse(w)
 	response.Body = "plaintext"
-	response.setImplict()
+	response.setImplicit()
 	if response.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
 		t.Fail()
 	}
@@ -27,7 +27,7 @@ func TestNewResponse(t *testing.T) {
 	response.Body = `
 	<!doctype html
 	`
-	response.setImplict()
+	response.setImplicit()
 	if response.Header.Get("Content-Type") != "text/html; charset=utf-8" {
 		t.Fail()
 	}
@@ -35,7 +35,7 @@ func TestNewResponse(t *testing.T) {
 	w = httptest.NewRecorder()
 	response = createResponse(w)
 	response.Body = map[string]string{"foo": "bar"}
-	response.setImplict()
+	response.setImplicit()
 	if response.Header.Get("Content-Type") != "application/json" {
 		t.Fail()
 	}
