@@ -164,7 +164,7 @@ func (response *Response) SetCookie(cookie *http.Cookie) {
 
 func (response *Response) setImplictBody() {
 	if response.Body == explictSetBody {
-		response.Body = ""
+		response.Body = http.StatusText(404)
 	}
 }
 
