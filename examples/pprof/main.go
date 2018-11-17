@@ -22,5 +22,5 @@ func main() {
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 	mux.Handle("/", app)
-	http.ListenAndServe(":3000", mux)
+	http.ListenAndServe("localhost:3000", mux)
 }

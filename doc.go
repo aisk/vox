@@ -52,7 +52,7 @@ Basic Example
 			res.Body = "Hello, " + name + "!"
 		})
 
-		app.Run(":3000")
+		app.Run("localhost:3000")
 	}
 
 

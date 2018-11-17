@@ -29,10 +29,6 @@ func main() {
 		res.Body = "Hello, " + req.Params["name"] + "!"
 	})
 
-	app.Get("/fuck", func(req *vox.Request, res *vox.Response) {
-		res.Body = "fuck"
-	})
-
 	// response
 	app.Get("/", func(req *vox.Request, res *vox.Response) {
 		// get the query string
@@ -43,5 +39,5 @@ func main() {
 		res.Body = "Hello, " + name + "!"
 	})
 
-	app.Run(":3000")
+	app.Run("localhost:3000")
 }
