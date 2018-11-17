@@ -84,5 +84,5 @@ func routeToRegexp(path string) *regexp.Regexp {
 	replaced := regexp.MustCompile(`{(?P<param>\w+)}`).ReplaceAllStringFunc(path, func(s string) string {
 		return "(?P<" + s[1:len(s)-1] + ">\\w+)"
 	})
-	return regexp.MustCompile(replaced)
+	return regexp.MustCompile("^" + replaced + "$")
 }

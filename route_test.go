@@ -70,7 +70,6 @@ func TestRouteShortcut(t *testing.T) {
 		"Put",
 		"Patch",
 		"Delete",
-		"Connect",
 		"Options",
 		"Trace",
 	}
@@ -117,8 +116,8 @@ func TestRouteToRegexp(t *testing.T) {
 			t.Errorf("expect %s, got %s", expect, result)
 		}
 	}
-	fn("/xxx/foo", "/xxx/foo")
-	fn(`/xxx/(?P<name>\w+)`, `/xxx/(?P<name>\w+)`)
-	fn(`/xxx/{name}`, `/xxx/(?P<name>\w+)`)
-	fn(`/xxx/{name2}`, `/xxx/(?P<name2>\w+)`)
+	fn("/xxx/foo", "^/xxx/foo$")
+	fn(`/xxx/(?P<name>\w+)`, `^/xxx/(?P<name>\w+)$`)
+	fn(`/xxx/{name}`, `^/xxx/(?P<name>\w+)$`)
+	fn(`/xxx/{name2}`, `^/xxx/(?P<name2>\w+)$`)
 }
