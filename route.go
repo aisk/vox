@@ -40,22 +40,22 @@ func (app *Application) Get(path string, handler Handler) {
 	app.Route("GET", path, handler)
 }
 
-// Post register a new path handler for GET method
+// Post register a new path handler for POST method
 func (app *Application) Post(path string, handler Handler) {
 	app.Route("POST", path, handler)
 }
 
-// Put register a new path handler for GET method
+// Put register a new path handler for PUT method
 func (app *Application) Put(path string, handler Handler) {
 	app.Route("PUT", path, handler)
 }
 
-// Delete register a new path handler for GET method
+// Delete register a new path handler for DELETE method
 func (app *Application) Delete(path string, handler Handler) {
 	app.Route("DELETE", path, handler)
 }
 
-// Option register a new path handler for GET method
+// Option register a new path handler for OPTION method
 func (app *Application) Option(path string, handler Handler) {
 	app.Route("OPTION", path, handler)
 }
