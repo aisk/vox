@@ -18,7 +18,7 @@ func (app *Application) Route(method string, path string, handler Handler) {
 }
 
 func match(req *Request, method string, path *regexp.Regexp) bool {
-	if req.Method != method {
+	if req.Method != method && method != "*" {
 		// TODO(asaka): ignore case?
 		return false
 	}

@@ -1,6 +1,7 @@
 package vox
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strings"
@@ -25,6 +26,20 @@ func TestRoute(t *testing.T) {
 	app.ServeHTTP(w, r)
 	if w.Result().StatusCode != 404 {
 		t.Errorf("expect StatusCode 404, got %d\r\n", w.Result().StatusCode)
+	}
+}
+
+func TestRouteMethod(t *testing.T) {
+	app := New()
+	app.Route("*", "/test_route", func(req *Request, res *Response) {
+		res.Body = "matched!"
+		res.Status = http.StatusFound
+	})
+	r := httptest.NewRequest("ANYMETHOD", "http://test.com/test_route", nil)
+	w := httptest.NewRecorder()
+	app.ServeHTTP(w, r)
+	if w.Result().StatusCode != http.StatusFound {
+		t.Errorf("expect StatusCode 302, got %d\r\n", w.Result().StatusCode)
 	}
 }
 
