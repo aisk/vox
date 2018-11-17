@@ -65,11 +65,6 @@ func (app *Application) Delete(path string, handler Handler) {
 	app.Route("DELETE", path, handler)
 }
 
-// Connect register a new path handler for CONNECT method.
-func (app *Application) Connect(path string, handler Handler) {
-	app.Route("CONNECT", path, handler)
-}
-
 // Options register a new path handler for OPTIONS method.
 func (app *Application) Options(path string, handler Handler) {
 	app.Route("OPTIONS", path, handler)
