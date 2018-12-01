@@ -27,7 +27,9 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	res := createResponse(rw)
 	res.request = req
 	handler(req, res)
-	respond(res)
+	if !res.DontRespond {
+		respond(res)
+	}
 }
 
 // Run the Vox application.

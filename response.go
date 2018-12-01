@@ -58,6 +58,9 @@ func hexEscapeNonASCII(s string) string {
 // HTTP client.
 type Response struct {
 	request *Request
+	// Don't write headers, status and body from Response struct to client. In
+	// the case of you're using the go's origin http.Response.
+	DontRespond bool
 	// Writer is the raw http.ResponseWriter for current request. You should
 	// assign the Body / Status / Header value instead of using this field.
 	Writer http.ResponseWriter
