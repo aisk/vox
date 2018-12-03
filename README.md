@@ -103,6 +103,28 @@ func main() {
 }
 ```
 
+### Get route parameters in URL path
+
+```go
+package main
+
+import (
+	"github.com/aisk/vox"
+)
+
+func hello(req *vox.Request, res *vox.Response) {
+	res.Body = "Hello, " + req.Params["name"] + "!"
+}
+
+func main() {
+	app := vox.New()
+
+	app.Get("/hello/{name}", hello)
+
+	app.Run("localhost:3000")
+}
+
+```
 
 ---
 
