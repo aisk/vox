@@ -23,23 +23,21 @@ import (
 	"time"
 
 	"github.com/aisk/vox"
+	"github.com/aisk/vox/middlewares/logging"
 )
 
 func main() {
 	app := vox.New()
 
-	// x-response-time
+	// logging
+	app.Use(logging.Middleware)
+
+	// custom middleware that add a x-response-time to the response header
 	app.Use(func(req *vox.Request, res *vox.Response) {
 		start := time.Now()
 		req.Next()
 		duration := time.Now().Sub(start)
 		res.Header.Set("X-Response-Time", fmt.Sprintf("%s", duration))
-	})
-
-	// logger
-	app.Use(func(req *vox.Request, res *vox.Response) {
-		req.Next()
-		fmt.Printf("%s %s\n", req.Method, req.URL)
 	})
 
 	// router param
