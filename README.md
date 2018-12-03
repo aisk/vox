@@ -13,7 +13,19 @@ A golang web framework for humans, inspired by [Koa](http://koajs.com) heavily.
 
 ---
 
+## Installation
+
+Using the `go get` power:
+
+```sh
+$ go get -u github.com/aisk/vox
+```
+
+---
+
 ## Example
+
+### Quick review
 
 ```go
 package main
