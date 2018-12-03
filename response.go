@@ -12,8 +12,7 @@ import (
 )
 
 var (
-	explicitSetStatus = -1
-	explicitSetBody   = struct{}{}
+	explicitSetBody = struct{}{}
 
 	bodyMatcher = regexp.MustCompile("^\\s*<")
 )
@@ -58,6 +57,7 @@ func hexEscapeNonASCII(s string) string {
 // HTTP client.
 type Response struct {
 	request *Request
+
 	// Don't write headers, status and body from Response struct to client. In
 	// the case of you're using the go's origin http.Response.
 	DontRespond bool
@@ -71,20 +71,6 @@ type Response struct {
 	Status int
 	// Headers which will be written to the response.
 	Header http.Header
-}
-
-func (response *Response) setImplicitStatus() {
-	if response.Status != explicitSetStatus {
-		// response's status is set by user.
-		return
-	}
-	if response.Body == explicitSetBody {
-		// response's body is not set, set it to 404.
-		response.Status = 404
-		return
-	}
-	// response's status is not set by user, give it a default value.
-	response.Status = 200
 }
 
 func (response *Response) setImplicitContentType() {
@@ -172,7 +158,6 @@ func (response *Response) setImplicitBody() {
 }
 
 func (response *Response) setImplicit() {
-	response.setImplicitStatus()
 	response.setImplicitContentType()
 	response.setImplicitBody()
 }
@@ -181,7 +166,7 @@ func createResponse(rw http.ResponseWriter) *Response {
 	return &Response{
 		Writer: rw,
 		Body:   explicitSetBody,
-		Status: explicitSetStatus,
+		Status: 404,
 		Header: rw.Header(),
 	}
 }

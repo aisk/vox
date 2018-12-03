@@ -10,6 +10,7 @@ import (
 // can using all the fields and method of http.Request. see http://golang.org/pkg/net/http/#Request.
 type Request struct {
 	*http.Request
+
 	// The origin http.Request.
 	Reqeust *http.Request
 	// Params the parameters which extracted from the route.
