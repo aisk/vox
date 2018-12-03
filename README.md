@@ -113,20 +113,64 @@ import (
 )
 
 func hello(req *vox.Request, res *vox.Response) {
-	res.Body = "Hello, " + req.Params["name"] + "!"
+	name := req.Params["name"]
+	res.Body = "Hello, " + name + "!"
 }
 
 func main() {
 	app := vox.New()
-
 	app.Get("/hello/{name}", hello)
-
 	app.Run("localhost:3000")
 }
+```
 
+### Get querystring parameters in URL
+
+```go
+package main
+
+import (
+	"github.com/aisk/vox"
+)
+
+func hello(req *vox.Request, res *vox.Response) {
+	name := req.URL.Query().Get("name")
+	res.Body = "Hello, " + name + "!"
+}
+
+func main() {
+	app := vox.New()
+	app.Get("/hello", hello)
+	app.Run("localhost:3000")
+}
 ```
 
 ---
+
+### Set response data
+
+```go
+package main
+
+import (
+	"github.com/aisk/vox"
+)
+
+func towel(req *vox.Request, res *vox.Response) {
+	// Set the response body, it can be string or []byte or any thing that json.Marshal accepts.
+	res.Body = "new towel is created!"
+	// Set the response status code.
+	res.Status = 201
+	// Set the response header.
+	res.Header.Set("Location", "/towels/42")
+}
+
+func main() {
+	app := vox.New()
+	app.Post("/towels", towel)
+	app.Run("localhost:3000")
+}
+```
 
 ## License
 
