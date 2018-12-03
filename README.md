@@ -172,6 +172,63 @@ func main() {
 }
 ```
 
+### Processing JSON request and send JSON response
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"strings"
+
+	"github.com/aisk/vox"
+)
+
+type Error struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+type Towel struct {
+	Color string `json:"color"`
+	Size  string `json:"size"`
+}
+
+func towel(req *vox.Request, res *vox.Response) {
+	if !strings.HasPrefix(req.Header.Get("Content-Type"), "application/json") {
+		res.Status = http.StatusUnsupportedMediaType // or just 415
+		// Set the body with a map, vox will marshal it to JSON automatically for you.
+		res.Body = map[string]interface{}{
+			"code":    1,
+			"message": "This is not a JSON request",
+		}
+		return
+	}
+
+	var t Towel
+	if err := json.NewDecoder(req.Body).Decode(&t); err != nil {
+		res.Status = http.StatusUnprocessableEntity // or just 422
+		res.Body = map[string]interface{}{
+			"code": 1,
+		}
+	}
+
+	// Set the body with a struct, vox will marshal it to JSON automatically for you.
+	res.Body = t
+	// Set the response status code.
+	res.Status = 201
+	// Set the response header.
+	res.Header.Set("Location", "/towels/42")
+}
+
+func main() {
+	app := vox.New()
+	app.Post("/towels", towel)
+	app.Run("localhost:3000")
+}
+```
+
 ## License
 
 MIT
