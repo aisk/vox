@@ -13,6 +13,18 @@ A golang web framework for humans, inspired by [Koa](http://koajs.com) heavily.
 
 ---
 
+- [Installation](#installation)
+- [Example](#example)
+  * [Quick review](#quick-review)
+  * [Handle HTTP Methods](#handle-http-methods)
+  * [Get route parameters in URL path](#get-route-parameters-in-url-path)
+  * [Get querystring parameters in URL](#get-querystring-parameters-in-url)
+  * [Set response data](#set-response-data)
+  * [Processing JSON request and send JSON response](#processing-json-request-and-send-json-response)
+- [License](#license)
+
+---
+
 ## Installation
 
 Using the `go get` power:
