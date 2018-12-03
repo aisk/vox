@@ -71,6 +71,39 @@ func main() {
 }
 ```
 
+### Handle HTTP Methods
+
+```go
+package main
+
+import (
+	"github.com/aisk/vox"
+)
+
+func handler(req *vox.Request, res *vox.Response) {
+	// Get the current request's HTTP method and put it to the result page.
+	res.Body = "HTTP Method is: " + req.Method
+}
+
+func main() {
+	app := vox.New()
+
+	app.Get("/", handler)
+	app.Post("/", handler)
+	app.Put("/", handler)
+	app.Delete("/", handler)
+	app.Head("/", handler)
+	app.Options("/", handler)
+	app.Trace("/", handler)
+
+	// In some case you need handle custom HTTP method that not in the RFCs like FLY.
+	app.Route("FLY", "/", handler)
+
+	app.Run("localhost:3000")
+}
+```
+
+
 ---
 
 ## License
