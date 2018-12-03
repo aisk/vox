@@ -145,8 +145,6 @@ func main() {
 }
 ```
 
----
-
 ### Set response data
 
 ```go
@@ -228,6 +226,8 @@ func main() {
 	app.Run("localhost:3000")
 }
 ```
+
+---
 
 ## License
 
