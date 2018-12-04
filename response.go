@@ -82,20 +82,9 @@ func (response *Response) setImplicitContentType() {
 		return
 	}
 
-	switch v := response.Body.(type) {
+	switch response.Body.(type) {
 	case []byte:
-		if bodyMatcher.Match(v) {
-			response.Header.Set("Content-Type", mime.TypeByExtension(".html"))
-		} else {
-			response.Header.Set("Content-Type", mime.TypeByExtension(".text"))
-		}
 	case string:
-		if bodyMatcher.MatchString(v) {
-			response.Header.Set("Content-Type", mime.TypeByExtension(".html"))
-		} else {
-			response.Header.Set("Content-Type", mime.TypeByExtension(".text"))
-		}
-	// case map[string]interface{}, map[string]string:
 	default:
 		response.Header.Set("Content-Type", mime.TypeByExtension(".json"))
 	}
