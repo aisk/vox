@@ -46,3 +46,11 @@ func TestBasicApplication(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestApplicationConfig(t *testing.T) {
+	app := New()
+	app.SetConfig("foo", "bar")
+	if app.GetConfig("foo") != "bar" {
+		t.Fatal()
+	}
+}

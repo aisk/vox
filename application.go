@@ -8,17 +8,31 @@ import (
 // An Application is a container which includes middlewares and config, and implemented the GO's net/http.Handler interface https://golang.org/pkg/net/http/#Handler.
 type Application struct {
 	middlewares []Handler
+	configs     map[string]string
 }
 
 // New returns a new vox Application.
 func New() *Application {
-	app := &Application{}
+	app := &Application{
+		middlewares: []Handler{},
+		configs:     map[string]string{},
+	}
 	return app
 }
 
 // Use a vox middleware.
 func (app *Application) Use(handler Handler) {
 	app.middlewares = append(app.middlewares, handler)
+}
+
+// SetConfig sets an application level variable.
+func (app *Application) SetConfig(key, value string) {
+	app.configs[key] = value
+}
+
+// GetConfig application level variable by key.
+func (app *Application) GetConfig(key string) string {
+	return app.configs[key]
 }
 
 func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
