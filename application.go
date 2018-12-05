@@ -1,7 +1,6 @@
 package vox
 
 import (
-	"encoding/json"
 	"net/http"
 )
 
@@ -14,7 +13,7 @@ type Application struct {
 // New returns a new vox Application.
 func New() *Application {
 	app := &Application{
-		middlewares: []Handler{},
+		middlewares: []Handler{respond},
 		configs:     map[string]string{},
 	}
 	return app
@@ -41,9 +40,6 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	res := createResponse(rw)
 	res.request = req
 	handler(req, res)
-	if !res.DontRespond {
-		respond(res)
-	}
 }
 
 // Run the Vox application.
@@ -63,25 +59,5 @@ func compose(middlewares []Handler) Handler {
 			}(i, next)
 		}
 		next()
-	}
-}
-
-func respond(res *Response) {
-	res.setImplicit()
-
-	res.Writer.WriteHeader(res.Status)
-
-	switch v := res.Body.(type) {
-	case []byte:
-		res.Writer.Write(v)
-	case string:
-		res.Writer.Write([]byte(v))
-	// TODO: support io.Reader type
-	default:
-		body, err := json.Marshal(v)
-		if err != nil {
-			panic(err)
-		}
-		res.Writer.Write(body)
 	}
 }
