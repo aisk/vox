@@ -9,7 +9,7 @@
 
 A golang web framework for humans, inspired by [Koa](http://koajs.com) heavily.
 
-![](https://i.v2ex.co/9MO3sMs4.jpeg)
+![](https://www.voxac100.org.uk/images/beatles_64/closeups/beatles_76.jpg)
 
 ---
 
