@@ -13,7 +13,7 @@ type Application struct {
 // New returns a new vox Application.
 func New() *Application {
 	app := &Application{
-		middlewares: []Handler{respond},
+		middlewares: []Handler{logging, respond},
 		configs:     map[string]string{},
 	}
 	return app

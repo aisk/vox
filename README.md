@@ -47,14 +47,10 @@ import (
 	"time"
 
 	"github.com/aisk/vox"
-	"github.com/aisk/vox/middlewares/logging"
 )
 
 func main() {
 	app := vox.New()
-
-	// logging
-	app.Use(logging.Middleware)
 
 	// custom middleware that add a x-response-time to the response header
 	app.Use(func(req *vox.Request, res *vox.Response) {
