@@ -11,8 +11,6 @@ import (
 type Request struct {
 	*http.Request
 
-	// The origin http.Request.
-	Reqeust *http.Request
 	// Params the parameters which extracted from the route.
 	//
 	// If the registered route is "/hello/{name}", and the actual path which
@@ -43,7 +41,6 @@ type Request struct {
 
 func createRequest(raw *http.Request) *Request {
 	return &Request{
-		raw,
 		raw,
 		make(map[string]string),
 		make(map[string]interface{}),
