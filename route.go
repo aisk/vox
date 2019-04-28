@@ -78,7 +78,7 @@ func (app *Application) Trace(path string, handler Handler) {
 
 func routeToRegexp(path string) *regexp.Regexp {
 	replaced := regexp.MustCompile(`{(?P<param>\w+)}`).ReplaceAllStringFunc(path, func(s string) string {
-		return "(?P<" + s[1:len(s)-1] + ">\\w+)"
+		return "(?P<" + s[1:len(s)-1] + ">[\\p{Lu}\\p{Ll}]+)"
 	})
 	return regexp.MustCompile("^" + replaced + "$")
 }
