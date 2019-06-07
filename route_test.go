@@ -118,6 +118,27 @@ func TestRouteToRegexp(t *testing.T) {
 	}
 	fn("/xxx/foo", "^/xxx/foo$")
 	fn(`/xxx/(?P<name>\w+)`, `^/xxx/(?P<name>\w+)$`)
-	fn(`/xxx/{name}`, `^/xxx/(?P<name>\w+)$`)
-	fn(`/xxx/{name2}`, `^/xxx/(?P<name2>\w+)$`)
+	fn(`/xxx/{name}`, `^/xxx/(?P<name>[-_.\p{Lu}\p{Ll}0-9]+)$`)
+	fn(`/xxx/{name2}`, `^/xxx/(?P<name2>[-_.\p{Lu}\p{Ll}0-9]+)$`)
+}
+
+func TestRouteWithUnicodeParams(t *testing.T) {
+	app := New()
+	app.Route("GET", `/{first}/\w+/{second}`, func(req *Request, res *Response) {
+		println("xxx:", req.Params["second"])
+		res.Body = "Hello Vox!"
+		if req.Params["first"] != "éèçà" {
+			t.Fail()
+		}
+		if req.Params["second"] != "aa_1-.aspx" {
+			t.Fail()
+		}
+	})
+	r := httptest.NewRequest("GET", "http://test.com/éèçà/xxxxx/aa_1-.aspx", nil)
+	w := httptest.NewRecorder()
+	app.ServeHTTP(w, r)
+	if w.Result().StatusCode != 200 {
+		println(w.Result().StatusCode)
+		t.Fail()
+	}
 }
