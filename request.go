@@ -1,8 +1,14 @@
 package vox
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
+	"strings"
 )
+
+// ErrNotAcceptable is the error returns when vox found the reqeust is not acceptable.
+var ErrNotAcceptable = errors.New("content is not acceptable")
 
 // A Request object contains all the information from current HTTP client.
 //
@@ -37,6 +43,8 @@ type Request struct {
 	// Next will call the next handler / middleware to processing request.
 	// It's the middleware's responsibility to call the Next function (or not).
 	Next func()
+
+	response *Response
 }
 
 func createRequest(raw *http.Request) *Request {
@@ -45,5 +53,19 @@ func createRequest(raw *http.Request) *Request {
 		make(map[string]string),
 		make(map[string]interface{}),
 		nil,
+		nil,
 	}
+}
+
+// JSON is a helper to decode JSON request body to go value, with additional functionality to check the content type header from the request. If the content type header do not starts with "application/json" or decode errors, this function will return an error and set the response status code to 406.
+func (request *Request) JSON(v interface{}) error {
+	if !strings.HasPrefix(request.Header.Get("content-type"), "application/json") {
+		request.response.Status = 406
+		return ErrNotAcceptable
+	}
+	err := json.NewDecoder(request.Body).Decode(v)
+	if err != nil {
+		request.response.Status = 406
+	}
+	return err
 }
