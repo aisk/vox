@@ -2,6 +2,7 @@ package vox
 
 import (
 	"encoding/json"
+	"io"
 )
 
 func respond(req *Request, res *Response) {
@@ -19,7 +20,20 @@ func respond(req *Request, res *Response) {
 		res.Writer.Write(v)
 	case string:
 		res.Writer.Write([]byte(v))
-	// TODO: support io.Reader type
+	case io.ReadCloser:
+		_, err := io.Copy(res.Writer, v)
+		if err != nil {
+			panic(err)
+		} else {
+			if err = v.Close(); err != nil {
+				panic(err)
+			}
+		}
+	case io.Reader:
+		_, err := io.Copy(res.Writer, v)
+		if err != nil {
+			panic(err)
+		}
 	default:
 		body, err := json.Marshal(v)
 		if err != nil {
@@ -27,5 +41,4 @@ func respond(req *Request, res *Response) {
 		}
 		res.Writer.Write(body)
 	}
-
 }

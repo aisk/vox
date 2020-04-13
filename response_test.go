@@ -1,8 +1,11 @@
 package vox
 
 import (
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -49,5 +52,55 @@ func TestSetCookie(t *testing.T) {
 	app.ServeHTTP(w, r)
 	if w.HeaderMap.Get("Set-Cookie") != "foo=bar" {
 		t.Fatal()
+	}
+}
+
+func TestResponseReader(t *testing.T) {
+	app := New()
+	app.Use(func(req *Request, res *Response) {
+		res.Body = strings.NewReader("Hello io.Reader!")
+	})
+	r := httptest.NewRequest("GET", "http://test.com/", nil)
+	w := httptest.NewRecorder()
+	app.ServeHTTP(w, r)
+	body, err := ioutil.ReadAll(w.Result().Body)
+	if err != nil {
+		t.Fail()
+	}
+	if string(body) != "Hello io.Reader!" {
+		t.Fail()
+	}
+}
+
+type MockReadCloser struct {
+	io.Reader
+	closed bool
+}
+
+func (rc *MockReadCloser) Close() error {
+	rc.closed = true
+	return nil
+}
+
+var _ io.ReadCloser = &MockReadCloser{}
+
+func TestResponseReadCloser(t *testing.T) {
+	app := New()
+	rc := &MockReadCloser{strings.NewReader("Hello io.Reader!"), false}
+	app.Use(func(req *Request, res *Response) {
+		res.Body = rc
+	})
+	r := httptest.NewRequest("GET", "http://test.com/", nil)
+	w := httptest.NewRecorder()
+	app.ServeHTTP(w, r)
+	body, err := ioutil.ReadAll(w.Result().Body)
+	if err != nil {
+		t.Fail()
+	}
+	if string(body) != "Hello io.Reader!" {
+		t.Fail()
+	}
+	if !rc.closed {
+		t.Fail()
 	}
 }
