@@ -11,10 +11,56 @@ A golang web framework for humans, inspired by [Koa](http://koajs.com) heavily.
 
 ![VoxLogo](https://cloudflare-ipfs.com/ipfs/QmUL4GF4HXhW6JUcNqVZBU1BwbJ2QULh81v5ZjZjPAWjnx)
 
-## Docs
+## Getting started
+
+### Installation
+
+Using the `go get` power:
+
+```sh
+$ go get -u github.com/aisk/vox
+```
+
+### Basic Web Application
+
+```sh
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/aisk/vox"
+)
+
+func main() {
+	app := vox.New()
+
+	// custom middleware that add a x-response-time to the response header
+	app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+		start := time.Now()
+		ctx.Next()
+		duration := time.Now().Sub(start)
+		res.Header.Set("X-Response-Time", fmt.Sprintf("%s", duration))
+	})
+
+	// router param
+	app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+		res.Body = "Hello, " + req.Params["name"] + "!"
+	})
+
+	app.Run("localhost:3000")
+}
+```
+
+## More Docs
 
 https://aisk.github.io/vox/
 
-## License
+## About the project
 
-MIT
+Vox is &copy; 2016-2020 by [aisk](https://github.com/aisk).
+
+### License
+
+Vox is distributed by a [MIT license](https://github.com/aisk/vox/tree/master/LICENSE).
