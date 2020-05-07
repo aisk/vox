@@ -18,7 +18,7 @@ func TestEmptyApplication(t *testing.T) {
 
 func TestBasicApplication(t *testing.T) {
 	app := New()
-	app.Use(func(req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *Request, res *Response) {
 		if req.Method != "GET" {
 			t.Fail()
 		}

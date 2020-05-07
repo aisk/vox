@@ -10,7 +10,7 @@ import (
 
 func TestRoute(t *testing.T) {
 	app := New()
-	app.Route("GET", "/test_route", func(req *Request, res *Response) {
+	app.Route("GET", "/test_route", func(ctx *Context, req *Request, res *Response) {
 		res.Body = "Hello Vox!"
 		res.Header.Set("foo", "bar")
 	})
@@ -31,7 +31,7 @@ func TestRoute(t *testing.T) {
 
 func TestMatchAnyMethod(t *testing.T) {
 	app := New()
-	app.Route("*", "/test_route", func(req *Request, res *Response) {
+	app.Route("*", "/test_route", func(ctx *Context, req *Request, res *Response) {
 		res.Body = "matched!"
 		res.Status = http.StatusFound
 	})
@@ -45,7 +45,7 @@ func TestMatchAnyMethod(t *testing.T) {
 
 func TestRouteWithParams(t *testing.T) {
 	app := New()
-	app.Route("GET", `/(?P<first>\w+)/\w+/(?P<second>\w+)`, func(req *Request, res *Response) {
+	app.Route("GET", `/(?P<first>\w+)/\w+/(?P<second>\w+)`, func(ctx *Context, req *Request, res *Response) {
 		res.Body = "Hello Vox!"
 		if req.Params["first"] != "foo" {
 			t.Fail()
@@ -78,7 +78,7 @@ func TestRouteShortcut(t *testing.T) {
 	for _, method := range methods {
 		args := []reflect.Value{}
 		args = append(args, reflect.ValueOf("/"))
-		args = append(args, reflect.ValueOf(func(req *Request, res *Response) {
+		args = append(args, reflect.ValueOf(func(ctx *Context, req *Request, res *Response) {
 			res.Body = method
 		}))
 		reflect.ValueOf(app).MethodByName(method).Call(args)
@@ -96,9 +96,9 @@ func TestRouteShortcut(t *testing.T) {
 
 func TestRouteFallthrough(t *testing.T) {
 	app := New()
-	app.Get("/fallthrough", func(req *Request, res *Response) {
+	app.Get("/fallthrough", func(ctx *Context, req *Request, res *Response) {
 	})
-	app.Use(func(req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *Request, res *Response) {
 		res.Body = "fallthrough"
 	})
 	r := httptest.NewRequest("Get", "http://test.com/", nil)
@@ -124,7 +124,7 @@ func TestRouteToRegexp(t *testing.T) {
 
 func TestRouteWithUnicodeParams(t *testing.T) {
 	app := New()
-	app.Route("GET", `/{first}/\w+/{second}`, func(req *Request, res *Response) {
+	app.Route("GET", `/{first}/\w+/{second}`, func(ctx *Context, req *Request, res *Response) {
 		println("xxx:", req.Params["second"])
 		res.Body = "Hello Vox!"
 		if req.Params["first"] != "éèçà" {

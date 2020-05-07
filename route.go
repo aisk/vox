@@ -8,13 +8,13 @@ import (
 func (app *Application) Route(method string, path string, handler Handler) {
 	// TODO: support string based path
 	r := routeToRegexp(path)
-	app.middlewares = append(app.middlewares, func(req *Request, res *Response) {
+	app.middlewares = append(app.middlewares, func(ctx *Context, req *Request, res *Response) {
 		if match(req, method, r) {
 			res.Status = 200
-			handler(req, res)
+			handler(ctx, req, res)
 			return
 		}
-		req.Next()
+		ctx.Next()
 	})
 }
 

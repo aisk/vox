@@ -9,7 +9,7 @@ func main() {
 	app := vox.New()
 	app.Use(pprof.Middleware)
 
-	app.Get("/", func(req *vox.Request, res *vox.Response) {
+	app.Get("/", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 		res.Body = "Hello, World!"
 	})
 

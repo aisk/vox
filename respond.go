@@ -5,8 +5,8 @@ import (
 	"io"
 )
 
-func respond(req *Request, res *Response) {
-	req.Next()
+func respond(ctx *Context, req *Request, res *Response) {
+	ctx.Next()
 	if res.DontRespond {
 		return
 	}

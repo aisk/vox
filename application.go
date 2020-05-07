@@ -40,7 +40,7 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	res := createResponse(rw)
 	req.response = res
 	res.request = req
-	handler(req, res)
+	handler(&Context{rq.Context(), nil}, req, res)
 }
 
 // Run the Vox application.
@@ -49,13 +49,13 @@ func (app *Application) Run(addr string) error {
 }
 
 func compose(middlewares []Handler) Handler {
-	return func(req *Request, res *Response) {
+	return func(ctx *Context, req *Request, res *Response) {
 		next := func() {}
 		for i := len(middlewares) - 1; i >= 0; i-- {
 			func(i int, nenext func()) {
 				next = func() {
-					req.Next = nenext
-					middlewares[i](req, res)
+					ctx.Next = nenext
+					middlewares[i](ctx, req, res)
 				}
 			}(i, next)
 		}
