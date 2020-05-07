@@ -9,7 +9,7 @@ import (
 
 func TestRequestJSONWithInvalidContentHeader(t *testing.T) {
 	app := New()
-	app.Use(func(req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *Request, res *Response) {
 		data := make(map[string]interface{})
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"
@@ -36,7 +36,7 @@ func TestRequestJSONWithInvalidContentHeader(t *testing.T) {
 
 func TestRequestJSONWithInvalidBody(t *testing.T) {
 	app := New()
-	app.Use(func(req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *Request, res *Response) {
 		data := make(map[string]interface{})
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"
@@ -64,7 +64,7 @@ func TestRequestJSONWithInvalidBody(t *testing.T) {
 
 func TestRequestJSON(t *testing.T) {
 	app := New()
-	app.Use(func(req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *Request, res *Response) {
 		data := make(map[string]interface{})
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"

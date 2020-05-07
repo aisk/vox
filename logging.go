@@ -17,10 +17,10 @@ func (writer *loggingResponseWriter) Write(b []byte) (int, error) {
 	return n, err
 }
 
-func logging(req *Request, res *Response) {
+func logging(ctx *Context, req *Request, res *Response) {
 	writer := &loggingResponseWriter{res.Writer, 0}
 	res.Writer = writer
-	req.Next()
+	ctx.Next()
 	username := "-"
 	if req.URL.User != nil {
 		if name := req.URL.User.Username(); name != "" {

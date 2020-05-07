@@ -1,4 +1,4 @@
 package vox
 
 // Handler is the type for middlewares and route handlers to register.
-type Handler func(*Request, *Response)
+type Handler func(*Context, *Request, *Response)

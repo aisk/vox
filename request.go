@@ -40,9 +40,6 @@ type Request struct {
 	// For example, mysession middleware can provide a function with type
 	// mysesion.GetSession(*vox.Request) *mysession.Session
 	State map[string]interface{}
-	// Next will call the next handler / middleware to processing request.
-	// It's the middleware's responsibility to call the Next function (or not).
-	Next func()
 
 	response *Response
 }
@@ -52,7 +49,6 @@ func createRequest(raw *http.Request) *Request {
 		raw,
 		make(map[string]string),
 		make(map[string]interface{}),
-		nil,
 		nil,
 	}
 }
