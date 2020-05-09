@@ -1,3 +1,5 @@
 remote_theme: pmarsceill/just-the-docs
 
 footer_content: "Copyright &copy; 2016-2020 aisk. Distributed by an <a href=\"https://github.com/aisk/vox/tree/master/LICENSE\">MIT license.</a>"
+
+ga_tracking: UA-23075420-10
