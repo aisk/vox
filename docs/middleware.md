@@ -1,10 +1,18 @@
 ---
 title: Middleware
 nav_order: 2
-has_toc: true
 ---
 
 # Middleware
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
 
 Vox's core concept is the middleware system. You can think of a vox application is a chain of middlewares, when a request came in, the middlewares will be executed one by one to the last.
 
