@@ -57,7 +57,11 @@ func main() {
 
 https://aisk.github.io/vox/
 
-## About the project
+## Need Support?
+
+If you need help for using vox, or have other questions, welcome to our [gitter chat room](https://gitter.im/go-vox/Lobby).
+
+## About the Project
 
 Vox is &copy; 2016-2020 by [aisk](https://github.com/aisk).
 
