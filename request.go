@@ -24,22 +24,6 @@ type Request struct {
 	//
 	// Multiple parameters with same key is invalid and will be ignored.
 	Params map[string]string
-	// State is a place which is recommended as storage for passing information
-	// through middleware and to your frontend views.
-	//
-	// State will be empty if you or your middlewares don't set it manually.
-	//
-	// It's recommended to using a namespace prefix to avoid key name conflict,
-	// like "mysession:session_id", especially for middleware libraries.
-	//
-	// State's value type is just interface{}, so you can cast it to it's own
-	// type using type assesions (https://tour.golang.org/methods/15).
-	//
-	// For middleware library authors, you should provide utility functions to
-	// extract the actually value, with type casting and namespace demangling.
-	// For example, mysession middleware can provide a function with type
-	// mysesion.GetSession(*vox.Request) *mysession.Session
-	State map[string]interface{}
 
 	response *Response
 }
@@ -48,7 +32,6 @@ func createRequest(raw *http.Request) *Request {
 	return &Request{
 		raw,
 		make(map[string]string),
-		make(map[string]interface{}),
 		nil,
 	}
 }
