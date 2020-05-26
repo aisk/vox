@@ -61,6 +61,7 @@ This is a simple validation example, you can validate the token in the request H
 func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
     if req.Header.Get("X-API-Token") == "a-secret" {
         ctx.Next()
+        return
     }
     res.Status = 403
     res.Body = "You shall not pass!"
