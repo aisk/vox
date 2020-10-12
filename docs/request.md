@@ -7,9 +7,9 @@ nav_order: 5
 
 Vox's `Request` object is built on top of go's native [`net/http.Request`](https://golang.org/pkg/net/http/#Request).
 
-Actually, a `vox.Request` is [embedding](https://golang.org/doc/effective_go.html#embedding) a [`net/http.Request`](https://golang.org/pkg/net/http/#Request) in it's struct definitation. So you can access any [`net/http.Request`](https://golang.org/pkg/net/http/#Request)'s public fields or methods from a `vox.Request`.
+Actually, a `vox.Request` is [embedding](https://golang.org/doc/effective_go.html#embedding) a [`net/http.Request`](https://golang.org/pkg/net/http/#Request) in it's struct definition. So you can access any [`net/http.Request`](https://golang.org/pkg/net/http/#Request)'s public fields or methods from a `vox.Request`.
 
-For example, you can access a reequest's HTTP header like this:
+For example, you can access a request's HTTP header like this:
 
 ```go
 func ExampleHandler(ctx *vox.Context, req *vox.Request, res *vox.Response) {

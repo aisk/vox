@@ -109,7 +109,7 @@ func main() {
 }
 ```
 
-## Get querystring parameters in URL
+## Get query string parameters in URL
 
 ```go
 package main
