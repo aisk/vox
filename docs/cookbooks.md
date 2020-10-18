@@ -1,5 +1,5 @@
 ---
-title: Usage
+title: Cookbooks
 nav_order: 100
 ---
 
