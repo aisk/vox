@@ -1,16 +1,16 @@
-name: Go
+name: Tests
 on: [push]
 jobs:
 
   build:
-    name: Build
+    name: Tests
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.14
+    - name: Set up Go 1.15
       uses: actions/setup-go@v1
       with:
-        go-version: 1.14
+        go-version: 1.15
       id: go
 
     - name: Check out code into the Go module directory
@@ -24,5 +24,5 @@ jobs:
             dep ensure
         fi
 
-    - name: Build
+    - name: Tests
       run: go build -v .
