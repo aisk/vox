@@ -1,6 +1,7 @@
 package vox
 
 import (
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -101,6 +102,26 @@ func TestResponseReadCloser(t *testing.T) {
 		t.Fail()
 	}
 	if !rc.closed {
+		t.Fail()
+	}
+}
+
+func TestResponseError(t *testing.T) {
+	app := New()
+	app.Use(func(ctx *Context, req *Request, res *Response) {
+		res.Body = errors.New("Error!")
+	})
+	r := httptest.NewRequest("GET", "http://test.com/", nil)
+	w := httptest.NewRecorder()
+	app.ServeHTTP(w, r)
+	body, err := ioutil.ReadAll(w.Result().Body)
+	if err != nil {
+		t.Fail()
+	}
+	if w.Code != 500 {
+		t.Fail()
+	}
+	if string(body) != "Error!" {
 		t.Fail()
 	}
 }

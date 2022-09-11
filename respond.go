@@ -34,6 +34,11 @@ func respond(ctx *Context, req *Request, res *Response) {
 		if err != nil {
 			panic(err)
 		}
+	case error:
+		_, err := res.Writer.Write([]byte(v.Error()))
+		if err != nil {
+			panic(err)
+		}
 	default:
 		body, err := json.Marshal(v)
 		if err != nil {

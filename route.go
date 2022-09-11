@@ -10,7 +10,6 @@ func (app *Application) Route(method string, path string, handler Handler) {
 	r := routeToRegexp(path)
 	app.middlewares = append(app.middlewares, func(ctx *Context, req *Request, res *Response) {
 		if match(req, method, r) {
-			res.Status = 200
 			handler(ctx, req, res)
 			return
 		}

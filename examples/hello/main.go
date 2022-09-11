@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -31,6 +32,11 @@ func main() {
 			name = "World"
 		}
 		res.Body = "Hello, " + name + "!"
+	})
+
+	// error as body
+	app.Get("/error", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+		res.Body = errors.New("Error!")
 	})
 
 	app.Run("localhost:3000")

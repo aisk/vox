@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	explicitSetBody = struct{}{}
-
-	bodyMatcher = regexp.MustCompile("^\\s*<")
+	explicitSetBody   = struct{}{}
+	explicitSetStatus = 0
+	bodyMatcher       = regexp.MustCompile("^\\s*<")
 )
 
 var htmlReplacer = strings.NewReplacer(
@@ -146,8 +146,27 @@ func (response *Response) setImplicitBody() {
 	}
 }
 
+func (response *Response) setImplicitStatus() {
+	if response.Status != explicitSetStatus {
+		return
+	}
+
+	if response.Body == explicitSetBody {
+		response.Status = 404
+		return
+	}
+
+	if _, ok := response.Body.(error); ok {
+		response.Status = 500
+		return
+	}
+
+	response.Status = 200
+}
+
 func (response *Response) setImplicit() {
 	response.setImplicitContentType()
+	response.setImplicitStatus()
 	response.setImplicitBody()
 }
 
@@ -155,7 +174,7 @@ func createResponse(rw http.ResponseWriter) *Response {
 	return &Response{
 		Writer: rw,
 		Body:   explicitSetBody,
-		Status: 404,
+		Status: explicitSetStatus,
 		Header: rw.Header(),
 	}
 }
