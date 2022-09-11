@@ -18,6 +18,11 @@ func (writer *loggingResponseWriter) Write(b []byte) (int, error) {
 }
 
 func logging(ctx *Context, req *Request, res *Response) {
+	if ctx.App.GetConfig("logging:disable") != "" {
+		ctx.Next()
+		return
+	}
+
 	writer := &loggingResponseWriter{res.Writer, 0}
 	res.Writer = writer
 	ctx.Next()

@@ -10,6 +10,7 @@ import (
 
 func TestRoute(t *testing.T) {
 	app := New()
+	app.SetConfig("logging:disable", "true")
 	app.Route("GET", "/test_route", func(ctx *Context, req *Request, res *Response) {
 		res.Body = "Hello Vox!"
 		res.Header.Set("foo", "bar")
@@ -31,6 +32,7 @@ func TestRoute(t *testing.T) {
 
 func TestMatchAnyMethod(t *testing.T) {
 	app := New()
+	app.SetConfig("logging:disable", "true")
 	app.Route("*", "/test_route", func(ctx *Context, req *Request, res *Response) {
 		res.Body = "matched!"
 		res.Status = http.StatusFound
@@ -45,6 +47,7 @@ func TestMatchAnyMethod(t *testing.T) {
 
 func TestRouteWithParams(t *testing.T) {
 	app := New()
+	app.SetConfig("logging:disable", "true")
 	app.Route("GET", `/(?P<first>\w+)/\w+/(?P<second>\w+)`, func(ctx *Context, req *Request, res *Response) {
 		res.Body = "Hello Vox!"
 		if req.Params["first"] != "foo" {
@@ -75,6 +78,7 @@ func TestRouteShortcut(t *testing.T) {
 	}
 
 	app := New()
+	app.SetConfig("logging:disable", "true")
 	for _, method := range methods {
 		args := []reflect.Value{}
 		args = append(args, reflect.ValueOf("/"))
@@ -96,6 +100,7 @@ func TestRouteShortcut(t *testing.T) {
 
 func TestRouteFallthrough(t *testing.T) {
 	app := New()
+	app.SetConfig("logging:disable", "true")
 	app.Get("/fallthrough", func(ctx *Context, req *Request, res *Response) {
 	})
 	app.Use(func(ctx *Context, req *Request, res *Response) {
@@ -124,8 +129,8 @@ func TestRouteToRegexp(t *testing.T) {
 
 func TestRouteWithUnicodeParams(t *testing.T) {
 	app := New()
+	app.SetConfig("logging:disable", "true")
 	app.Route("GET", `/{first}/\w+/{second}`, func(ctx *Context, req *Request, res *Response) {
-		println("xxx:", req.Params["second"])
 		res.Body = "Hello Vox!"
 		if req.Params["first"] != "éèçà" {
 			t.Fail()
@@ -138,7 +143,6 @@ func TestRouteWithUnicodeParams(t *testing.T) {
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, r)
 	if w.Result().StatusCode != 200 {
-		println(w.Result().StatusCode)
 		t.Fail()
 	}
 }

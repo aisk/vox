@@ -8,6 +8,7 @@ import (
 
 func TestEmptyApplication(t *testing.T) {
 	app := New()
+	app.SetConfig("logging:disable", "true")
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, r)
@@ -18,6 +19,7 @@ func TestEmptyApplication(t *testing.T) {
 
 func TestBasicApplication(t *testing.T) {
 	app := New()
+	app.SetConfig("logging:disable", "true")
 	app.Use(func(ctx *Context, req *Request, res *Response) {
 		if req.Method != "GET" {
 			t.Fail()

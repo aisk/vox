@@ -40,7 +40,7 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	res := createResponse(rw)
 	req.response = res
 	res.request = req
-	handler(&Context{rq.Context(), nil}, req, res)
+	handler(&Context{rq.Context(), app, nil}, req, res)
 }
 
 // Run the Vox application.

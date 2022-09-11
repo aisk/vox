@@ -7,6 +7,7 @@ import "context"
 // the standard context.Context.
 type Context struct {
 	context.Context
+	App *Application
 	// Next will call the next handler / middleware to processing request.
 	// It's the middleware's responsibility to call the Next function (or not).
 	Next func()
