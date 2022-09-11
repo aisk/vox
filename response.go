@@ -5,16 +5,12 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"regexp"
-	"strconv"
 	"strings"
-	"unicode/utf8"
 )
 
 var (
 	explicitSetBody   = struct{}{}
 	explicitSetStatus = 0
-	bodyMatcher       = regexp.MustCompile("^\\s*<")
 )
 
 var htmlReplacer = strings.NewReplacer(
@@ -27,30 +23,6 @@ var htmlReplacer = strings.NewReplacer(
 
 func htmlEscape(s string) string {
 	return htmlReplacer.Replace(s)
-}
-
-func hexEscapeNonASCII(s string) string {
-	newLen := 0
-	for i := 0; i < len(s); i++ {
-		if s[i] >= utf8.RuneSelf {
-			newLen += 3
-		} else {
-			newLen++
-		}
-	}
-	if newLen == len(s) {
-		return s
-	}
-	b := make([]byte, 0, newLen)
-	for i := 0; i < len(s); i++ {
-		if s[i] >= utf8.RuneSelf {
-			b = append(b, '%')
-			b = strconv.AppendInt(b, int64(s[i]), 16)
-		} else {
-			b = append(b, s[i])
-		}
-	}
-	return string(b)
 }
 
 // A Response object contains all the information which will written to current

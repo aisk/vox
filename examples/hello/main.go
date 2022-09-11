@@ -31,7 +31,16 @@ func main() {
 		if name == "" {
 			name = "World"
 		}
-		res.Body = "Hello, " + name + "!"
+		res.Body = `
+		<!doctype html>
+			<head>
+				<title>xxx</title>
+			</head>
+			<body>
+				<p>Hello, ` + name + `!</p>
+			</body>
+		</html>
+		`
 	})
 
 	// error as body
@@ -39,5 +48,5 @@ func main() {
 		res.Body = errors.New("Error!")
 	})
 
-	app.Run("localhost:3000")
+	app.Run("[::]:3000")
 }
