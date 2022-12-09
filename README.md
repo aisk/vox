@@ -23,7 +23,7 @@ $ go get -u github.com/aisk/vox
 
 ### Basic Web Application
 
-```sh
+```go
 package main
 
 import (
