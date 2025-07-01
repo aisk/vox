@@ -76,6 +76,7 @@ func main() {
 	app.Get("/", handler)
 	app.Post("/", handler)
 	app.Put("/", handler)
+	app.Patch("/", handler)
 	app.Delete("/", handler)
 	app.Head("/", handler)
 	app.Options("/", handler)
