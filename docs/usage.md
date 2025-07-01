@@ -29,8 +29,8 @@ import (
 func main() {
 	app := vox.New()
 
-	// custom middleware that add a x-response-time to the response header
-	app.Use(func(ctx *vox.Context, *vox.Request, res *vox.Response) {
+	// custom middleware that adds an x-response-time to the response header
+	app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 		start := time.Now()
 		ctx.Next()
 		duration := time.Now().Sub(start)
@@ -38,12 +38,12 @@ func main() {
 	})
 
 	// router param
-	app.Get("/hello/{name}", func(ctx *vox.Context, *vox.Request, res *vox.Response) {
+	app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 		res.Body = "Hello, " + req.Params["name"] + "!"
 	})
 
 	// response
-	app.Get("/", func(ctx *vox.Context, *vox.Request, res *vox.Response) {
+	app.Get("/", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 		// get the query string
 		name := req.URL.Query().Get("name")
 		if name == "" {
@@ -65,7 +65,7 @@ import (
 	"github.com/aisk/vox"
 )
 
-func handler(ctx *vox.Context, *vox.Request, res *vox.Response) {
+func handler(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 	// Get the current request's HTTP method and put it to the result page.
 	res.Body = "HTTP Method is: " + req.Method
 }
@@ -97,7 +97,7 @@ import (
 	"github.com/aisk/vox"
 )
 
-func hello(ctx *vox.Context, *vox.Request, res *vox.Response) {
+func hello(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 	name := req.Params["name"]
 	res.Body = "Hello, " + name + "!"
 }
@@ -118,7 +118,7 @@ import (
 	"github.com/aisk/vox"
 )
 
-func hello(ctx *vox.Context, *vox.Request, res *vox.Response) {
+func hello(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 	name := req.URL.Query().Get("name")
 	res.Body = "Hello, " + name + "!"
 }
@@ -139,8 +139,8 @@ import (
 	"github.com/aisk/vox"
 )
 
-func towel(ctx *vox.Context, *vox.Request, res *vox.Response) {
-	// Set the response body, it can be string or []byte or any thing that json.Marshal accepts.
+func towel(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	// Set the response body, it can be a string, []byte, or anything that json.Marshal accepts.
 	res.Body = "new towel is created!"
 	// Set the response status code.
 	res.Status = 201
@@ -178,7 +178,7 @@ type Towel struct {
 	Size  string `json:"size"`
 }
 
-func towel(ctx *vox.Context, *vox.Request, res *vox.Response) {
+func towel(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 	if !strings.HasPrefix(req.Header.Get("Content-Type"), "application/json") {
 		res.Status = http.StatusUnsupportedMediaType // or just 415
 		// Set the body with a map, vox will marshal it to JSON automatically for you.

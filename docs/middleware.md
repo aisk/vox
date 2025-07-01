@@ -14,19 +14,19 @@ nav_order: 2
 
 ---
 
-Vox's core concept is the middleware system. You can think of a vox application is a chain of middlewares, when a request came in, the middlewares will be executed one by one to the last.
+Vox's core concept is the middleware system. You can think of a vox application as a chain of middlewares. When a request comes in, the middlewares will be executed one by one.
 
-The middleware can pre-process the request, for example, extract cookies from HTTP header, transform it to user object or session object, store the result in context for future usage.
+The middleware can pre-process the request, for example, by extracting cookies from the HTTP header, transforming them into a user or session object, and storing the result in the context for future use.
 
-And the middleware can terminate the execution of next middlewares and respond to users, for authentication or input validation scenarios.
+A middleware can also terminate the execution of the next middlewares and respond to the user. This is useful for authentication or input validation.
 
-Middleware can also modify the request or response. You can parse input data from JSON to go struct for known schema, for you do not need to process it in your main actual business handler. You can also marshall the result/error to JSON or other encoding types in one place.
+Middleware can also modify the request or response. You can parse input data from JSON to a Go struct for a known schema, so you don't need to process it in your main business handler. You can also marshal the result/error to JSON or other encoding types in one place.
 
-Your actual business handler can be a middleware also, and this usually intends to be the last in the middleware chain.
+Your actual business handler can also be a middleware, and this is usually intended to be the last in the middleware chain.
 
 ## A basic middleware
 
-The simplest middleware is change the response body to a string like this:
+The simplest middleware changes the response body to a string like this:
 
 ```go
 func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
@@ -34,15 +34,15 @@ func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 }
 ```
 
-The `res.Body` should write to response HTTP body, if someone opened your website, you should see the string you wrote.
+The `res.Body` will be written to the response HTTP body. If someone opens your website, they should see the string you wrote.
 
-## Middleware for pre/post-process
+## Middleware for pre/post-processing
 
-There is an example for do something like record the current time, and call the next middlewares, and modify the response, wrote the whole processing time for current request to the HTTP header.
+Here is an example of a middleware that records the current time, calls the next middleware, and then modifies the response to include the total processing time for the current request in the HTTP header.
 
-Please notice the `ctx.Next()`, in this call, the execution will be moved to next middlewares in chain, and when they finished, `ctx.Next()` will be returned.
+Please notice the `ctx.Next()` call. This call moves the execution to the next middleware in the chain. When the next middleware finishes, `ctx.Next()` will return.
 
-The `ctx.Next()` takes no argument, and do have no return. or input or output should via the request/response/context or global variables if you like.
+The `ctx.Next()` function takes no arguments and has no return value. Input and output should be handled through the `Request`, `Response`, and `Context` objects, or through global variables if you prefer.
 
 ```go
 func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
@@ -55,7 +55,7 @@ func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 
 ## Terminate execution
 
-This is a simple validation example, you can validate the token in the request HTTP header. If it's validated, call `ctx.Next` for future middleware executions. Otherwise, set the status code and body in response for an error message, and return to previous middlewares until the top to respond to users.
+This is a simple validation example. You can validate a token in the request's HTTP header. If it's validated, call `ctx.Next()` to continue to the next middleware. Otherwise, set the status code and body in the response for an error message and return to the previous middlewares until the top to respond to the user.
 
 ```go
 func(ctx *vox.Context, req *vox.Request, res *vox.Response) {

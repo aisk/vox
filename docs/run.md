@@ -3,7 +3,7 @@ title: Run
 nav_order: 3
 ---
 
-# Run You Application
+# Run Your Application
 {: .no_toc }
 
 ## Table of contents
@@ -16,20 +16,20 @@ nav_order: 3
 
 ## Run
 
-You can run your vox application by simply call the `Run` method:
+You can run your vox application by simply calling the `Run` method:
 
 ```go
 app := vox.New()
 app.Run("localhost:3000")
 ```
 
-Now your application has listened on port 3000 with localhost. `Run` accept whatever [net/http.ListenAndServe](https://golang.org/pkg/net/http/#ListenAndServe) takes in first parameter.
+Now your application is listening on port 3000. The `Run` method accepts the same arguments as [`net/http.ListenAndServe`](https://golang.org/pkg/net/http/#ListenAndServe).
 
-## Integrate with your exists HTTP server
+## Integrate with an existing HTTP server
 
-If you have an http server in go already, you can integrate vox to it. This may help you migrate from and to vox.
+If you already have an HTTP server in Go, you can integrate vox with it. This can help you migrate to and from vox.
 
-Actually, `vox.Application` implemented the [net/http.Handler](https://golang.org/pkg/net/http/#Handler) interface. So you can pass a `vox.Application` instance to where [net/http.Handler](https://golang.org/pkg/net/http/#Handler) are accepted, like `http.Handle`:
+Actually, `vox.Application` implements the [`net/http.Handler`](https://golang.org/pkg/net/http/#Handler) interface. So you can pass a `vox.Application` instance to any function that accepts a [`net/http.Handler`](https://golang.org/pkg/net/http/#Handler), like `http.Handle`:
 
 ```go
 func rawHandler(w http.ResponseWriter, _ *http.Request) {
