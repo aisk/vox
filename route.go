@@ -1,38 +1,30 @@
 package vox
 
-import (
-	"regexp"
-)
+// routeHandler handles route matching and parameter extraction
+func (app *Application) routeHandler(ctx *Context, req *Request, res *Response) {
+	match, found := app.router.Match(req.Method, "", req.URL.Path)
+	if found {
+		for k, v := range match.Params {
+			req.Params[k] = v
+		}
+		if h, ok := match.Handler.(Handler); ok {
+			h(ctx, req, res)
+		}
+	}
+	ctx.Next()
+}
 
 // Route will register a new path handler to a given path.
 func (app *Application) Route(method string, path string, handler Handler) {
-	// TODO: support string based path
-	r := routeToRegexp(path)
-	app.middlewares = append(app.middlewares, func(ctx *Context, req *Request, res *Response) {
-		if match(req, method, r) {
-			handler(ctx, req, res)
-			return
-		}
-		ctx.Next()
-	})
-}
-
-func match(req *Request, method string, path *regexp.Regexp) bool {
-	if req.Method != method && method != "*" {
-		// TODO(asaka): ignore case?
-		return false
+	var err error
+	if method == "*" {
+		err = app.router.Handle(path, handler)
+	} else {
+		err = app.router.Handle(method+" "+path, handler)
 	}
-	match := path.FindStringSubmatch(req.URL.Path)
-	if match == nil {
-		return false
+	if err != nil {
+		panic(err)
 	}
-	for i, name := range path.SubexpNames() {
-		if i == 0 || name == "" {
-			continue
-		}
-		req.Params[name] = match[i]
-	}
-	return true
 }
 
 // Get register a new path handler for GET method.
@@ -73,11 +65,4 @@ func (app *Application) Options(path string, handler Handler) {
 // Trace register a new path handler for TRACE method.
 func (app *Application) Trace(path string, handler Handler) {
 	app.Route("TRACE", path, handler)
-}
-
-func routeToRegexp(path string) *regexp.Regexp {
-	replaced := regexp.MustCompile(`{(?P<param>\w+)}`).ReplaceAllStringFunc(path, func(s string) string {
-		return "(?P<" + s[1:len(s)-1] + ">[-_.\\p{Lu}\\p{Ll}0-9]+)"
-	})
-	return regexp.MustCompile("^" + replaced + "$")
 }

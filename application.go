@@ -2,10 +2,13 @@ package vox
 
 import (
 	"net/http"
+
+	"github.com/aisk/route122"
 )
 
 // An Application is a container which includes middlewares and config, and implemented the GO's net/http.Handler interface https://golang.org/pkg/net/http/#Handler.
 type Application struct {
+	router      *route122.Router
 	middlewares []Handler
 	configs     map[string]string
 }
@@ -13,9 +16,10 @@ type Application struct {
 // New returns a new vox Application.
 func New() *Application {
 	app := &Application{
-		middlewares: []Handler{logging, respond},
-		configs:     map[string]string{},
+		router:  route122.New(),
+		configs: map[string]string{},
 	}
+	app.middlewares = []Handler{logging, app.routeHandler, respond}
 	return app
 }
 

@@ -48,7 +48,7 @@ func TestMatchAnyMethod(t *testing.T) {
 func TestRouteWithParams(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Route("GET", `/(?P<first>\w+)/\w+/(?P<second>\w+)`, func(ctx *Context, req *Request, res *Response) {
+	app.Route("GET", "/{first}/xxxxx/{second}", func(ctx *Context, req *Request, res *Response) {
 		res.Body = "Hello Vox!"
 		if req.Params["first"] != "foo" {
 			t.Fail()
@@ -114,23 +114,10 @@ func TestRouteFallthrough(t *testing.T) {
 	}
 }
 
-func TestRouteToRegexp(t *testing.T) {
-	fn := func(input, expect string) {
-		result := routeToRegexp(input)
-		if result.String() != expect {
-			t.Errorf("expect %s, got %s", expect, result)
-		}
-	}
-	fn("/xxx/foo", "^/xxx/foo$")
-	fn(`/xxx/(?P<name>\w+)`, `^/xxx/(?P<name>\w+)$`)
-	fn(`/xxx/{name}`, `^/xxx/(?P<name>[-_.\p{Lu}\p{Ll}0-9]+)$`)
-	fn(`/xxx/{name2}`, `^/xxx/(?P<name2>[-_.\p{Lu}\p{Ll}0-9]+)$`)
-}
-
 func TestRouteWithUnicodeParams(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Route("GET", `/{first}/\w+/{second}`, func(ctx *Context, req *Request, res *Response) {
+	app.Route("GET", "/{first}/xxxxx/{second}", func(ctx *Context, req *Request, res *Response) {
 		res.Body = "Hello Vox!"
 		if req.Params["first"] != "éèçà" {
 			t.Fail()
