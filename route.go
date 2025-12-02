@@ -7,9 +7,8 @@ func (app *Application) routeHandler(ctx *Context, req *Request, res *Response) 
 		for k, v := range match.Params {
 			req.Params[k] = v
 		}
-		if h, ok := match.Handler.(Handler); ok {
-			h(ctx, req, res)
-		}
+		h := match.Handler
+		h(ctx, req, res)
 	}
 	ctx.Next()
 }

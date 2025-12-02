@@ -1,5 +1,5 @@
-github.com/aisk/route122 v0.0.0-20251129140018-16cd6cc48089 h1:FN73eBiN0dKR4WI1RjxiKssNVD+MMJAz4r/+BxrER5A=
-github.com/aisk/route122 v0.0.0-20251129140018-16cd6cc48089/go.mod h1:wV8INfN/2tGkuHol+j0Fjrz3iZijZrMJkB+A8LoZQNU=
+github.com/aisk/route122 v0.0.0-20251202161139-dcb9ea5032bf h1:ErBxXOkr2O2/fJUK3DdJ2+pJiN4uWiOkPfK1n09/T04=
+github.com/aisk/route122 v0.0.0-20251202161139-dcb9ea5032bf/go.mod h1:jkw+s53hE0F8zPUqoYdTASdv5RAD0HAvKOepG/kJCas=
 golang.org/x/net v0.35.0 h1:T5GQRQb2y08kTAByq9L4/bz8cipCdA8FbRTXewonqY8=
 golang.org/x/net v0.35.0/go.mod h1:EglIi67kWsHKlRzzVMUD93VMSWGFOMSZgxFjparz1Qk=
 golang.org/x/text v0.22.0 h1:bofq7m3/HAFvbF51jz3Q9wLg3jkvSPuiZu/pD1XwgtM=

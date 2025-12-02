@@ -8,7 +8,7 @@ import (
 
 // An Application is a container which includes middlewares and config, and implemented the GO's net/http.Handler interface https://golang.org/pkg/net/http/#Handler.
 type Application struct {
-	router      *route122.Router
+	router      *route122.Router[Handler]
 	middlewares []Handler
 	configs     map[string]string
 }
@@ -16,7 +16,7 @@ type Application struct {
 // New returns a new vox Application.
 func New() *Application {
 	app := &Application{
-		router:  route122.New(),
+		router:  route122.New[Handler](),
 		configs: map[string]string{},
 	}
 	app.middlewares = []Handler{logging, app.routeHandler, respond}
