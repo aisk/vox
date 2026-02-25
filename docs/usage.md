@@ -29,7 +29,7 @@ import (
 func main() {
 	app := vox.New()
 
-	// custom middleware that adds an x-response-time to the response header
+	// custom middleware that adds an X-Response-Time header
 	app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 		start := time.Now()
 		ctx.Next()
@@ -82,12 +82,34 @@ func main() {
 	app.Options("/", handler)
 	app.Trace("/", handler)
 
-	// In some case you need handle custom HTTP method that not in the RFCs like FLY.
+	// In some cases you may need to handle a custom HTTP method not defined by RFCs, such as FLY.
 	app.Route("FLY", "/", handler)
 
 	app.Run("localhost:3000")
 }
 ```
+
+## Match any HTTP method
+
+You can match all HTTP methods for a path with `"*"`:
+
+```go
+package main
+
+import (
+	"github.com/aisk/vox"
+)
+
+func main() {
+	app := vox.New()
+	app.Route("*", "/health", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+		res.Body = "ok: " + req.Method
+	})
+	app.Run("localhost:3000")
+}
+```
+
+Use this pattern for generic endpoints (for example, debug probes). For business APIs, explicit methods (`Get`, `Post`, `Put`, ...) are usually clearer.
 
 ## Get route parameters in URL path
 
@@ -110,7 +132,7 @@ func main() {
 }
 ```
 
-## Get querystring parameters in URL
+## Get query string parameters in URL
 
 ```go
 package main

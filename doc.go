@@ -1,9 +1,9 @@
 /*
-Package vox is a golang web framework for humans, inspired by Koa http://koajs.com heavily.
+Package vox is a Go web framework for humans, heavily inspired by Koa http://koajs.com.
 
 Introduction
 
-Vox is a web framework inspired by Koa, which aims to be a minimal and elegent library for web applications.
+Vox is a web framework inspired by Koa, which aims to be a minimal and elegant library for web applications.
 
 Installation
 
@@ -23,27 +23,27 @@ Basic Example
 	func main() {
 		app := vox.New()
 
-		// x-response-time
-		app.Use(func(req *vox.Request, res *vox.Response) {
+		// X-Response-Time
+		app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 			start := time.Now()
-			req.Next()
+			ctx.Next()
 			duration := time.Now().Sub(start)
 			res.Header.Set("X-Response-Time", fmt.Sprintf("%s", duration))
 		})
 
 		// logger
-		app.Use(func(req *vox.Request, res *vox.Response) {
-			req.Next()
+		app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+			ctx.Next()
 			fmt.Printf("%s %s\n", req.Method, req.URL)
 		})
 
 		// router param
-		app.Get("/hello/{name}", func(req *vox.Request, res *vox.Response) {
+		app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 			res.Body = "Hello, " + req.Params["name"] + "!"
 		})
 
 		// response
-		app.Get("/", func(req *vox.Request, res *vox.Response) {
+		app.Get("/", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 			// get the query string
 			name := req.URL.Query().Get("name")
 			if name == "" {

@@ -5,7 +5,7 @@ nav_order: 6
 
 # Response
 
-Vox's `Response` object is built on top of go's native [`net/http.ResponseWriter`](https://golang.org/pkg/net/http/#ResponseWriter).
+Vox's `Response` object is built on top of Go's native [`net/http.ResponseWriter`](https://golang.org/pkg/net/http/#ResponseWriter).
 
 A `vox.Response` contains all the information which will be written to the HTTP client.
 
@@ -90,7 +90,7 @@ func CookieHandler(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 
 ## DontRespond
 
-If you want to use the go's native `http.ResponseWriter` to write the response, you can set the `DontRespond` field to `true`.
+If you want to use Go's native `http.ResponseWriter` to write the response, you can set the `DontRespond` field to `true`.
 
 ```go
 func DontRespondHandler(ctx *vox.Context, req *vox.Request, res *vox.Response) {

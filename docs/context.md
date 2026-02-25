@@ -5,7 +5,7 @@ nav_order: 4
 
 # Context
 
-Vox's `Context` object is a wrapper around the standard `context.Context` from the Go standard library. It provides a way to pass data between middlewares and to control the execution of the middleware chain.
+Vox's `Context` object is a wrapper around the standard `context.Context` from the Go standard library. It provides a way to pass data between middleware and control the execution of the middleware chain.
 
 ## App
 

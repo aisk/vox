@@ -16,7 +16,7 @@ nav_order: 3
 
 ## Run
 
-You can run your vox application by simply calling the `Run` method:
+You can run your Vox application by simply calling the `Run` method:
 
 ```go
 app := vox.New()
@@ -48,3 +48,5 @@ func main() {
     http.ListenAndServe("localhost:3000", nil)
 }
 ```
+
+If you need runtime profiling endpoints, see [Pprof Middleware](pprof).

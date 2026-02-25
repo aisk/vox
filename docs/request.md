@@ -5,9 +5,9 @@ nav_order: 5
 
 # Request
 
-Vox's `Request` object is built on top of go's native [`net/http.Request`](https://golang.org/pkg/net/http/#Request).
+Vox's `Request` object is built on top of Go's native [`net/http.Request`](https://golang.org/pkg/net/http/#Request).
 
-Actually, a `vox.Request` is [embedding](https://golang.org/doc/effective_go.html#embedding) a [`net/http.Request`](https://golang.org/pkg/net/http/#Request) in its struct definition. So you can access any of [`net/http.Request`](https://golang.org/pkg/net/http/#Request)'s public fields or methods from a `vox.Request`.
+Actually, `vox.Request` [embeds](https://golang.org/doc/effective_go.html#embedding) a [`net/http.Request`](https://golang.org/pkg/net/http/#Request). So you can access any public field or method from [`net/http.Request`](https://golang.org/pkg/net/http/#Request) directly on a `vox.Request`.
 
 For example, you can access a request's HTTP header like this:
 
@@ -17,9 +17,9 @@ func ExampleHandler(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 }
 ```
 
-Additionally, `vox.Request` has some extra fields/methods that [`net/http.Request`](https://golang.org/pkg/net/http/#Request) does not provide.
+Additionally, `vox.Request` has some extra fields and methods that [`net/http.Request`](https://golang.org/pkg/net/http/#Request) does not provide.
 
-For example, vox has a `JSON` method to decode a JSON request body to go values, with additional functionality to check the content-type header from the request. If the content-type header does not start with "application/json" or a decode error occurs, this function will return an error and set the response status code to 406.
+For example, Vox has a `JSON` method to decode a JSON request body into Go values, with additional logic to validate the `Content-Type` header. If `Content-Type` does not start with "application/json", or a decode error occurs, this function returns an error and sets the response status code to 406.
 
 ```go
 func PostJSONHandler(ctx *vox.Context, req *vox.Request, res *vox.Response) {

@@ -7,7 +7,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/d9a7d62ccc89b1752cf3/maintainability)](https://codeclimate.com/github/aisk/vox/maintainability)
 [![Gitter chat](https://badges.gitter.im/go-vox/Lobby.png)](https://gitter.im/go-vox/Lobby)
 
-A golang web framework for humans, inspired by [Koa](http://koajs.com) heavily.
+A Go web framework for humans, heavily inspired by [Koa](http://koajs.com).
 
 ![VoxLogo](https://cloudflare-ipfs.com/ipfs/QmUL4GF4HXhW6JUcNqVZBU1BwbJ2QULh81v5ZjZjPAWjnx)
 
@@ -15,7 +15,7 @@ A golang web framework for humans, inspired by [Koa](http://koajs.com) heavily.
 
 ### Installation
 
-Using the `go get` power:
+Install with `go get`:
 
 ```sh
 $ go get -u github.com/aisk/vox
@@ -36,7 +36,7 @@ import (
 func main() {
 	app := vox.New()
 
-	// custom middleware that add a x-response-time to the response header
+	// custom middleware that adds an X-Response-Time header
 	app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 		start := time.Now()
 		ctx.Next()
@@ -56,6 +56,12 @@ func main() {
 ## More Docs
 
 https://aisk.github.io/vox/
+
+Key guides:
+
+- Middleware execution order: https://aisk.github.io/vox/middleware/
+- Match any method with `Route("*", ...)`: https://aisk.github.io/vox/usage/
+- Pprof middleware: https://aisk.github.io/vox/pprof/
 
 ## Need Support?
 

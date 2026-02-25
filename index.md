@@ -2,14 +2,14 @@
 layout: default
 title: Home
 nav_order: 1
-description: "A golang web framework for humans, inspired by Koa heavily."
+description: "A Go web framework for humans, heavily inspired by Koa."
 permalink: /
 ---
 
 # VOX: Go Web Framework for Humans
 {: .fs-9 }
 
-A golang web framework for humans, inspired by Koa heavily.
+A Go web framework for humans, heavily inspired by Koa.
 {: .fs-6 .fw-300 }
 
 [Get started now](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/aisk/vox){: .btn .fs-5 .mb-4 .mb-md-0 }
@@ -20,7 +20,7 @@ A golang web framework for humans, inspired by Koa heavily.
 
 ### Installation
 
-Using the `go get` power:
+Install with `go get`:
 
 ```sh
 $ go get -u github.com/aisk/vox
@@ -28,7 +28,7 @@ $ go get -u github.com/aisk/vox
 
 ### Basic Web Application
 
-```sh
+```go
 package main
 
 import (
@@ -41,7 +41,7 @@ import (
 func main() {
 	app := vox.New()
 
-	// custom middleware that add a x-response-time to the response header
+	// custom middleware that adds an X-Response-Time header
 	app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 		start := time.Now()
 		ctx.Next()
@@ -57,6 +57,12 @@ func main() {
 	app.Run("localhost:3000")
 }
 ```
+
+## Useful guides
+
+- [Middleware execution order](middleware)
+- [Usage examples (`Route("*", ...)` included)](usage)
+- [Pprof middleware](pprof)
 
 ## About the project
 
