@@ -111,6 +111,29 @@ func main() {
 
 Use this pattern for generic endpoints (for example, debug probes). For business APIs, explicit methods (`Get`, `Post`, `Put`, ...) are usually clearer.
 
+## Serve static files
+
+You can expose a local directory under a URL prefix with static middleware:
+
+```go
+package main
+
+import (
+	"github.com/aisk/vox"
+	"github.com/aisk/vox/middlewares/static"
+)
+
+func main() {
+	app := vox.New()
+
+	// Serve files in ./public under /assets
+	// GET /assets/logo.png -> ./public/logo.png
+	app.Use(static.Middleware("/assets", "./public"))
+
+	app.Run("localhost:3000")
+}
+```
+
 ## Get route parameters in URL path
 
 ```go
