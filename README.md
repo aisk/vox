@@ -69,7 +69,7 @@ If you need help for using vox, or have other questions, welcome to our [gitter 
 
 ## About the Project
 
-Vox is &copy; 2016-2020 by [aisk](https://github.com/aisk).
+Vox is &copy; 2016-2026 by [aisk](https://github.com/aisk).
 
 ### License
 
