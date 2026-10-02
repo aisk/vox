@@ -2,6 +2,7 @@ package vox
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/aisk/route122"
 )
@@ -11,6 +12,7 @@ type Application struct {
 	router      *route122.Router[Handler]
 	middlewares []Handler
 	configs     map[string]string
+	maxBodySize int64
 }
 
 // New returns a new vox Application.
@@ -19,6 +21,7 @@ func New() *Application {
 		router:  route122.New[Handler](),
 		configs: map[string]string{},
 	}
+	app.SetConfig("request:max-body-size", "1048576")
 	app.middlewares = []Handler{logging, app.routeHandler, respond}
 	return app
 }
@@ -29,7 +32,17 @@ func (app *Application) Use(handler Handler) {
 }
 
 // SetConfig sets an application level variable.
+//
+// "request:max-body-size" limits the size in bytes of JSON request bodies. It
+// defaults to 1 MiB, and 0 disables the limit.
 func (app *Application) SetConfig(key, value string) {
+	if key == "request:max-body-size" {
+		size, err := strconv.ParseInt(value, 10, 64)
+		if err != nil || size < 0 {
+			panic("vox: request:max-body-size must be a non-negative number of bytes")
+		}
+		app.maxBodySize = size
+	}
 	app.configs[key] = value
 }
 
@@ -42,6 +55,7 @@ func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
 	handler := compose(app.middlewares)
 	req := createRequest(rq)
 	res := createResponse(rw)
+	req.app = app
 	req.response = res
 	res.request = req
 	handler(&Context{rq.Context(), app, nil}, req, res)

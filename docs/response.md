@@ -27,7 +27,7 @@ func ReaderHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Resp
 }
 ```
 
-If the value is an `error`, the error message will be written to the response body and the status code will be set to 500.
+If the value is an `error`, the error message will be written to the response body and the status code defaults to 500.
 
 ```go
 func ErrorHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[error]) {
@@ -35,7 +35,7 @@ func ErrorHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Respo
 }
 ```
 
-For any other type, it will be marshaled to JSON and the `Content-Type` header will be set to `application/json`.
+For any other type, it will be marshaled to JSON and the `Content-Type` header will be set to `application/json`, unless the handler has set one or the status is 204 or 304.
 
 ```go
 func JSONHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[map[string]string]) {

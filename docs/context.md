@@ -15,6 +15,8 @@ The `App` field is a pointer to the `vox.Application` instance. This can be used
 
 The `Next` function is used to call the next middleware in the chain. It's the middleware's responsibility to call the `Next` function. If a middleware does not call `Next`, the execution of the middleware chain will be terminated.
 
+`Next` is for middleware only. A route handler returns to continue the chain, and calling `Next` from one panics on the first request to that route.
+
 Middleware receives `BaseRequest` and `BaseResponse`. This logger calls `ctx.Next()` and measures the time spent in subsequent middleware:
 
 ```go
