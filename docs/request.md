@@ -35,15 +35,15 @@ The limit applies to JSON decoding only. A `Request[vox.NoBody]` handler reads t
 
 ## Decode errors
 
-A rejected body is responded to with a short plain text message, such as `malformed JSON at offset 12` or `invalid type for field "name"`. The response body seen by middleware is a `*vox.DecodeError`, whose `Err` field holds the underlying error. Middleware can use it to log the failure or to replace the response.
+A rejected body is responded to with a short plain text message, such as `malformed JSON at offset 12` or `invalid type for field "name"`. The response body seen by middleware after `ctx.Next()` returns is a `*vox.DecodeError`, whose `Err` field holds the underlying error. Middleware can use it to log the failure or to replace the response.
 
 ```go
 app.Use(func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
+    ctx.Next()
     if err, ok := res.Body.(*vox.DecodeError); ok {
         log.Printf("decode %s: %v", req.URL.Path, err.Err)
         res.Body = map[string]string{"error": err.Message}
     }
-    ctx.Next()
 })
 ```
 

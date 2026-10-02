@@ -22,38 +22,39 @@ A middleware can also terminate execution of the remaining middleware and respon
 
 Middleware can also modify the request or response. You can parse input data from JSON to a Go struct for a known schema, so you don't need to process it in your main business handler. You can also marshal the result/error to JSON or other encoding types in one place.
 
-Route handlers receive `Request[In]` and `Response[Out]`. Middleware uses `BaseRequest` and `BaseResponse`; it may inspect or replace the committed route response body. Type safety applies at the route handler boundary.
+Route handlers receive `Request[In]` and `Response[Out]`. Middleware uses `BaseRequest` and `BaseResponse`; after `ctx.Next()` returns, it may inspect or replace the committed route response body. Type safety applies at the route handler boundary.
 
 ## Execution order
 
 Vox has a built-in middleware chain. In `vox.New()`, the initial order is:
 
 1. `logging`
-2. `routeHandler`
-3. `respond`
+2. `respond`
 
-Middleware functions registered by `app.Use(...)` are appended after these built-ins.
+Middleware functions registered by `app.Use(...)` are appended after these built-ins, in registration order. The router always runs last, no matter where routes are registered relative to `app.Use(...)`.
 
 For example:
 
 ```go
 app := vox.New()
 app.Use(middlewareA)
+app.Get("/", handler)
 app.Use(middlewareB)
 ```
 
 The execution flow is:
 
 1. `logging`
-2. `routeHandler`
-3. `respond`
-4. `middlewareA`
-5. `middlewareB`
-6. back to `respond` to write status/header/body to the client
+2. `respond`
+3. `middlewareA`
+4. `middlewareB`
+5. the matched route handler
+6. back through `middlewareB` and `middlewareA`
+7. back to `respond` to write status/header/body to the client
 
-A matched route runs inside `routeHandler`, before user middleware. Its response body is committed before `respond` and user middleware execute. Consequently, `app.Use` middleware does not guard route execution; authentication that must prevent business side effects must be performed before invoking that business logic.
+Every middleware wraps route execution. Code before `ctx.Next()` runs before the route handler, and a middleware that returns without calling `ctx.Next()` prevents the route from running. Code after `ctx.Next()` sees the response committed by the route and may change it.
 
-Also, `routeHandler` always calls `ctx.Next()`, whether a route is matched or not. This means middleware functions added by `app.Use(...)` can still run as fallback handlers.
+When no route matches, the router leaves the response untouched and the client gets a 404. A middleware can act as a fallback handler by calling `ctx.Next()` first and filling in the response when `res.HasBody()` is still false.
 
 ## A basic middleware
 
@@ -65,7 +66,7 @@ func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 }
 ```
 
-The `res.Body` will be written to the response HTTP body. If someone opens your website, they should see the string you wrote.
+The `res.Body` will be written to the response HTTP body. If someone opens your website, they should see the string you wrote. Since this middleware never calls `ctx.Next()`, it answers every request and no route is reached.
 
 ## Middleware for pre/post-processing
 
@@ -101,4 +102,4 @@ func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 
 ## Route handlers and Next
 
-`ctx.Next()` is only for middleware. Route handlers return normally to continue into the response and fallback middleware. Calling `Next` from a route panics before advancing the chain, preventing premature response writes.
+`ctx.Next()` is only for middleware. A route handler is the end of the chain; returning from it hands control back to the middleware that wrapped it. Calling `Next` from a route panics.

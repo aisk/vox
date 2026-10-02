@@ -155,6 +155,17 @@ func main() {
 }
 ```
 
+## Route matching
+
+Routes use the pattern syntax of Go's `http.ServeMux`. When several patterns match a request, the most specific one wins, regardless of registration order, so `/users/me` takes precedence over `/users/{id}`.
+
+A pattern ending in `/` matches every path under it. In particular `/` matches all paths, so once it is registered no request gets a 404. Use `/{$}` to match only the root path, and `{name...}` to capture the rest of the path:
+
+```go
+app.Get("/{$}", index)                // only "/"
+app.Get("/files/{path...}", download) // "/files/a/b.txt" gives req.Params["path"] == "a/b.txt"
+```
+
 ## Get query string parameters in URL
 
 ```go

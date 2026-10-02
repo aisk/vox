@@ -5,7 +5,7 @@ nav_order: 6
 
 # Response
 
-Route handlers receive `*vox.Response[T]`. Set `Body` to a value of type `T`, `Status` to an HTTP status code, and `Header` to the response headers. The response is written after the handler and subsequent middleware return.
+Route handlers receive `*vox.Response[T]`. Set `Body` to a value of type `T`, `Status` to an HTTP status code, and `Header` to the response headers. The response is written after the handler and the middleware wrapping it return.
 
 ## Body
 

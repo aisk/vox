@@ -5,7 +5,8 @@ import (
 	"reflect"
 )
 
-// routeHandler handles route matching and parameter extraction
+// routeHandler handles route matching and parameter extraction. It is the
+// end of the middleware chain.
 func (app *Application) routeHandler(ctx *Context, req *BaseRequest, res *BaseResponse) {
 	match, found := app.router.Match(req.Method, "", req.URL.Path)
 	if found {
@@ -15,7 +16,6 @@ func (app *Application) routeHandler(ctx *Context, req *BaseRequest, res *BaseRe
 		h := match.Handler
 		h(ctx, req, res)
 	}
-	ctx.Next()
 }
 
 // registerRoute stores a uniform handler in the route tree.
@@ -32,7 +32,8 @@ func (app *Application) registerRoute(method string, path string, handler Handle
 }
 
 // Route registers a route handler. Inputs other than NoBody are decoded as JSON.
-// Route handlers return to continue processing; Context.Next is for middleware only.
+// Route handlers run after all middleware and return when done; Context.Next is
+// for middleware only.
 func (app *Application) Route[In, Out any](method, path string, handler RouteHandler[In, Out]) {
 	app.registerRoute(method, path, func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		var body In

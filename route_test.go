@@ -100,16 +100,77 @@ func TestRouteShortcut(t *testing.T) {
 func TestRouteFallthrough(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Get("/fallthrough", func(ctx *Context, req *Request[NoBody], res *Response[any]) {
+	app.Get("/matched", func(ctx *Context, req *Request[NoBody], res *Response[string]) {
+		res.Body = "matched"
 	})
 	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
-		res.Body = "fallthrough"
+		ctx.Next()
+		if !res.HasBody() {
+			res.Body = "fallthrough"
+		}
 	})
-	r := httptest.NewRequest("GET", "http://test.com/fallthrough", nil)
+	for path, want := range map[string]string{"/matched": "matched", "/unmatched": "fallthrough"} {
+		w := httptest.NewRecorder()
+		app.ServeHTTP(w, httptest.NewRequest("GET", "http://test.com"+path, nil))
+		if w.Result().StatusCode != 200 || w.Body.String() != want {
+			t.Errorf("%s: status=%d body=%q", path, w.Code, w.Body.String())
+		}
+	}
+}
+
+func TestMiddlewareWrapsRoute(t *testing.T) {
+	app := New()
+	app.SetConfig("logging:disable", "true")
+	var order []string
+	middleware := func(name string) Handler {
+		return func(ctx *Context, req *BaseRequest, res *BaseResponse) {
+			order = append(order, name+" before")
+			ctx.Next()
+			order = append(order, name+" after")
+		}
+	}
+	// Routes run last regardless of where they are registered.
+	app.Use(middleware("a"))
+	app.Get("/", func(ctx *Context, req *Request[NoBody], res *Response[string]) {
+		order = append(order, "route")
+		res.Body = "ok"
+	})
+	app.Use(middleware("b"))
 	w := httptest.NewRecorder()
+	app.ServeHTTP(w, httptest.NewRequest("GET", "/", nil))
+	want := "a before, b before, route, b after, a after"
+	if got := strings.Join(order, ", "); got != want || w.Body.String() != "ok" {
+		t.Fatalf("order=%q body=%q", got, w.Body.String())
+	}
+}
+
+func TestMiddlewareGuardsRoute(t *testing.T) {
+	app := New()
+	app.SetConfig("logging:disable", "true")
+	called := false
+	app.Get("/", func(ctx *Context, req *Request[NoBody], res *Response[string]) {
+		called = true
+		res.Body = "secret"
+	})
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
+		if req.Header.Get("X-API-Token") != "a-secret" {
+			res.Status = http.StatusForbidden
+			res.Body = "denied"
+			return
+		}
+		ctx.Next()
+	})
+	w := httptest.NewRecorder()
+	app.ServeHTTP(w, httptest.NewRequest("GET", "/", nil))
+	if called || w.Code != http.StatusForbidden || w.Body.String() != "denied" {
+		t.Fatalf("called=%v status=%d body=%q", called, w.Code, w.Body.String())
+	}
+	r := httptest.NewRequest("GET", "/", nil)
+	r.Header.Set("X-API-Token", "a-secret")
+	w = httptest.NewRecorder()
 	app.ServeHTTP(w, r)
-	if w.Result().StatusCode != 200 || w.Body.String() != "fallthrough" {
-		t.Fail()
+	if !called || w.Code != 200 || w.Body.String() != "secret" {
+		t.Fatalf("called=%v status=%d body=%q", called, w.Code, w.Body.String())
 	}
 }
 
@@ -157,14 +218,14 @@ func TestRouteBodyTypes(t *testing.T) {
 		res.Body = "ok"
 	})
 	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
+		ctx.Next()
 		if req.URL.Path == "/users/42" {
 			body, ok := res.Body.(userBody)
 			if !ok || body.Name != "Ada" {
-				t.Fatalf("body not committed before middleware: %#v", res.Body)
+				t.Fatalf("body not committed when the route returned: %#v", res.Body)
 			}
 		}
 		res.Header.Set("X-Middleware", "yes")
-		ctx.Next()
 	})
 	r := httptest.NewRequest("POST", "/users/42", strings.NewReader(`{"name":"Ada"}`))
 	r.Header.Set("Content-Type", "application/json; charset=utf-8")
@@ -216,7 +277,8 @@ func TestRouteDecode(t *testing.T) {
 				res.Body = req.Body.Name
 			})
 			var decodeErr *DecodeError
-			app.Use(func(_ *Context, _ *BaseRequest, res *BaseResponse) {
+			app.Use(func(ctx *Context, _ *BaseRequest, res *BaseResponse) {
+				ctx.Next()
 				decodeErr, _ = res.Body.(*DecodeError)
 			})
 			r := httptest.NewRequest("POST", "/", strings.NewReader(tc.body))
@@ -399,10 +461,10 @@ func TestRouteSharesContext(t *testing.T) {
 	calls := 0
 	app.Use(func(ctx *Context, _ *BaseRequest, _ *BaseResponse) {
 		calls++
+		ctx.Next()
 		if ctx != routeContext || ctx.Value(key{}) != "value" {
 			t.Fatal("route context was not shared")
 		}
-		ctx.Next()
 	})
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, httptest.NewRequest("GET", "/", nil))

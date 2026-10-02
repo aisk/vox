@@ -2,6 +2,7 @@ package vox
 
 import (
 	"net/http"
+	"slices"
 	"strconv"
 
 	"github.com/aisk/route122"
@@ -22,7 +23,7 @@ func New() *Application {
 		configs: map[string]string{},
 	}
 	app.SetConfig("request:max-body-size", "1048576")
-	app.middlewares = []Handler{logging, app.routeHandler, respond}
+	app.middlewares = []Handler{logging, respond}
 	return app
 }
 
@@ -52,7 +53,8 @@ func (app *Application) GetConfig(key string) string {
 }
 
 func (app *Application) ServeHTTP(rw http.ResponseWriter, rq *http.Request) {
-	handler := compose(app.middlewares)
+	// The router runs last, so every middleware wraps route execution.
+	handler := compose(slices.Concat(app.middlewares, []Handler{app.routeHandler}))
 	req := createRequest(rq)
 	res := createResponse(rw)
 	req.app = app
