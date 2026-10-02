@@ -1,7 +1,7 @@
 # VOX
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/aisk/vox.svg)](https://pkg.go.dev/github.com/aisk/vox)
-[![Build Status](https://travis-ci.org/aisk/vox.svg?branch=master)](https://travis-ci.org/aisk/vox)
+[![Build Status](https://github.com/aisk/vox/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/aisk/vox/actions/workflows/go.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/aisk/vox.svg)](https://codecov.io/gh/aisk/vox)
 [![Go Report Card](https://goreportcard.com/badge/github.com/aisk/vox)](https://goreportcard.com/report/github.com/aisk/vox)
 [![Maintainability](https://api.codeclimate.com/v1/badges/d9a7d62ccc89b1752cf3/maintainability)](https://codeclimate.com/github/aisk/vox/maintainability)
