@@ -69,15 +69,15 @@ func main() {
 
 Route handlers declare their request and response body types in the function signature. Vox decodes request bodies as JSON; use `Request[vox.NoBody]` when no decoding is needed. Middleware receives `BaseRequest` and `BaseResponse`.
 
-## More Docs
+## Documentation
 
-https://aisk.github.io/vox/
+The full documentation lives at https://aisk.github.io/vox/.
 
-Key guides:
-
-- Middleware execution order: https://aisk.github.io/vox/middleware/
-- Match any method with `Route("*", ...)`: https://aisk.github.io/vox/usage/
-- Pprof middleware: https://aisk.github.io/vox/pprof/
+- [Getting Started](https://aisk.github.io/vox/getting-started/)
+- [Routing](https://aisk.github.io/vox/guide/routing/), [Route Handlers](https://aisk.github.io/vox/guide/handlers/) and [Middleware](https://aisk.github.io/vox/guide/middleware/)
+- [Request](https://aisk.github.io/vox/guide/request/), [Response](https://aisk.github.io/vox/guide/response/) and [Error Handling](https://aisk.github.io/vox/guide/errors/)
+- [Static Files](https://aisk.github.io/vox/middlewares/static/) and [Pprof](https://aisk.github.io/vox/middlewares/pprof/) middleware
+- [Recipes](https://aisk.github.io/vox/recipes/)
 
 ## Need Support?
 
