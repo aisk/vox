@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func respond(ctx *Context, req *Request, res *Response) {
+func respond(ctx *Context, req *BaseRequest, res *BaseResponse) {
 	ctx.Next()
 	if res.DontRespond {
 		return
@@ -14,6 +14,15 @@ func respond(ctx *Context, req *Request, res *Response) {
 	res.setImplicit()
 
 	res.Writer.WriteHeader(res.Status)
+
+	if req.Method == "HEAD" || res.Status == 204 || res.Status == 304 {
+		if closer, ok := res.Body.(io.ReadCloser); ok {
+			if err := closer.Close(); err != nil {
+				panic(err)
+			}
+		}
+		return
+	}
 
 	switch v := res.Body.(type) {
 	case []byte:

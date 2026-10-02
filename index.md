@@ -42,7 +42,7 @@ func main() {
 	app := vox.New()
 
 	// custom middleware that adds an X-Response-Time header
-	app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Use(func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 		start := time.Now()
 		ctx.Next()
 		duration := time.Now().Sub(start)
@@ -50,7 +50,7 @@ func main() {
 	})
 
 	// router param
-	app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 		res.Body = "Hello, " + req.Params["name"] + "!"
 	})
 

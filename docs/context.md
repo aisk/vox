@@ -15,10 +15,10 @@ The `App` field is a pointer to the `vox.Application` instance. This can be used
 
 The `Next` function is used to call the next middleware in the chain. It's the middleware's responsibility to call the `Next` function. If a middleware does not call `Next`, the execution of the middleware chain will be terminated.
 
-Here is an example of a simple logging middleware that uses the `Context` object to pass data to the next middleware:
+Middleware receives `BaseRequest` and `BaseResponse`. This logger calls `ctx.Next()` and measures the time spent in subsequent middleware:
 
 ```go
-func Logger(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func Logger(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
     start := time.Now()
     ctx.Next()
     log.Printf("%s %s %v", req.Method, req.URL.Path, time.Since(start))

@@ -22,7 +22,7 @@ A middleware can also terminate execution of the remaining middleware and respon
 
 Middleware can also modify the request or response. You can parse input data from JSON to a Go struct for a known schema, so you don't need to process it in your main business handler. You can also marshal the result/error to JSON or other encoding types in one place.
 
-Your actual business handler can also be a middleware, and this is usually intended to be the last in the middleware chain.
+Route handlers receive `Request[In]` and `Response[Out]`. Middleware uses `BaseRequest` and `BaseResponse`; it may inspect or replace the committed route response body. Type safety applies at the route handler boundary.
 
 ## Execution order
 
@@ -51,6 +51,8 @@ The execution flow is:
 5. `middlewareB`
 6. back to `respond` to write status/header/body to the client
 
+A matched route runs inside `routeHandler`, before user middleware. Its response body is committed before `respond` and user middleware execute. Consequently, `app.Use` middleware does not guard route execution; authentication that must prevent business side effects must be performed before invoking that business logic.
+
 Also, `routeHandler` always calls `ctx.Next()`, whether a route is matched or not. This means middleware functions added by `app.Use(...)` can still run as fallback handlers.
 
 ## A basic middleware
@@ -58,7 +60,7 @@ Also, `routeHandler` always calls `ctx.Next()`, whether a route is matched or no
 The simplest middleware changes the response body to a string like this:
 
 ```go
-func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
     res.Body = "Hello, world!"
 }
 ```
@@ -71,10 +73,10 @@ Here is an example of a middleware that records the current time, calls the next
 
 Note the `ctx.Next()` call. It moves execution to the next middleware in the chain. When the next middleware finishes, `ctx.Next()` returns.
 
-The `ctx.Next()` function takes no arguments and has no return value. Input and output should be handled through the `Request`, `Response`, and `Context` objects.
+The `ctx.Next()` function takes no arguments and has no return value. Input and output should be handled through the `BaseRequest`, `BaseResponse`, and `Context` objects.
 
 ```go
-func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
     start := time.Now()
     ctx.Next()
     duration := time.Now().Sub(start)
@@ -87,7 +89,7 @@ func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
 This is a simple validation example. Validate a token in the request header. If the token is valid, call `ctx.Next()` to continue. Otherwise, set an error status/body and return.
 
 ```go
-func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
     if req.Header.Get("X-API-Token") != "a-secret" {
         res.Status = 403
         res.Body = "You shall not pass!"
@@ -96,3 +98,7 @@ func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
     ctx.Next()
 }
 ```
+
+## Route handlers and Next
+
+`ctx.Next()` is only for middleware. Route handlers return normally to continue into the response and fallback middleware. Calling `Next` from a route panics before advancing the chain, preventing premature response writes.

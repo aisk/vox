@@ -21,7 +21,7 @@ func Middleware(prefix string, root string) vox.Handler {
 		fileServer = http.StripPrefix(prefix, fileServer)
 	}
 
-	return func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	return func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 		ctx.Next()
 
 		if req.Method != http.MethodGet && req.Method != http.MethodHead {
@@ -60,13 +60,12 @@ func matchPrefix(requestPath string, prefix string) bool {
 	return requestPath == prefix || strings.HasPrefix(requestPath, prefix+"/")
 }
 
-func isResponseUnwritten(res *vox.Response) bool {
+func isResponseUnwritten(res *vox.BaseResponse) bool {
 	if res.DontRespond {
 		return false
 	}
 	if res.Status != 0 {
 		return false
 	}
-	body, ok := res.Body.(struct{})
-	return ok && body == (struct{}{})
+	return !res.HasBody()
 }

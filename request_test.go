@@ -10,7 +10,7 @@ import (
 func TestRequestJSONWithInvalidContentHeader(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Use(func(ctx *Context, req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		data := make(map[string]interface{})
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"
@@ -38,7 +38,7 @@ func TestRequestJSONWithInvalidContentHeader(t *testing.T) {
 func TestRequestJSONWithInvalidBody(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Use(func(ctx *Context, req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		data := make(map[string]interface{})
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"
@@ -67,7 +67,7 @@ func TestRequestJSONWithInvalidBody(t *testing.T) {
 func TestRequestJSON(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Use(func(ctx *Context, req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		data := make(map[string]interface{})
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"

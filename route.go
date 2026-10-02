@@ -1,7 +1,15 @@
 package vox
 
+import (
+	"encoding/json"
+	"io"
+	"mime"
+	"net/http"
+	"strings"
+)
+
 // routeHandler handles route matching and parameter extraction
-func (app *Application) routeHandler(ctx *Context, req *Request, res *Response) {
+func (app *Application) routeHandler(ctx *Context, req *BaseRequest, res *BaseResponse) {
 	match, found := app.router.Match(req.Method, "", req.URL.Path)
 	if found {
 		for k, v := range match.Params {
@@ -13,8 +21,8 @@ func (app *Application) routeHandler(ctx *Context, req *Request, res *Response) 
 	ctx.Next()
 }
 
-// Route will register a new path handler to a given path.
-func (app *Application) Route(method string, path string, handler Handler) {
+// registerRoute stores a uniform handler in the route tree.
+func (app *Application) registerRoute(method string, path string, handler Handler) {
 	var err error
 	if method == "*" {
 		err = app.router.Handle(path, handler)
@@ -26,42 +34,91 @@ func (app *Application) Route(method string, path string, handler Handler) {
 	}
 }
 
-// Get register a new path handler for GET method.
-func (app *Application) Get(path string, handler Handler) {
+// Route registers a route handler. Inputs other than NoBody are decoded as JSON.
+// Route handlers return to continue processing; Context.Next is for middleware only.
+func (app *Application) Route[In, Out any](method, path string, handler RouteHandler[In, Out]) {
+	app.registerRoute(method, path, func(ctx *Context, req *BaseRequest, res *BaseResponse) {
+		var body In
+		if _, skip := any(body).(NoBody); !skip {
+			mediaType, _, err := mime.ParseMediaType(req.Header.Get("Content-Type"))
+			if err != nil || (mediaType != "application/json" &&
+				!(strings.HasPrefix(mediaType, "application/") && strings.HasSuffix(mediaType, "+json"))) {
+				res.Status = http.StatusUnsupportedMediaType
+				res.Body = http.StatusText(res.Status)
+				return
+			}
+			decoder := json.NewDecoder(req.Body)
+			if err := decoder.Decode(&body); err != nil {
+				res.Status = http.StatusBadRequest
+				res.Body = http.StatusText(res.Status)
+				return
+			}
+			// Require exactly one JSON value, allowing trailing whitespace.
+			var extra any
+			if err := decoder.Decode(&extra); err != io.EOF {
+				res.Status = http.StatusBadRequest
+				res.Body = http.StatusText(res.Status)
+				return
+			}
+		}
+		request := &Request[In]{BaseRequest: req, Body: body}
+		response := &Response[Out]{BaseResponse: res}
+		next := ctx.Next
+		defer func() { ctx.Next = next }()
+		ctx.Next = func() {
+			panic("vox: Context.Next is only available in middleware; return from a route handler instead")
+		}
+		handler(ctx, request, response)
+		if res.DontRespond || res.redirected {
+			return
+		}
+		if _, empty := any(response.Body).(NoBody); empty {
+			res.Body = []byte{}
+			if res.Status == 0 {
+				res.Status = http.StatusNoContent
+			}
+		} else {
+			res.Body = response.Body
+		}
+	})
+}
+
+// Get registers a route handler for GET requests.
+func (app *Application) Get[In, Out any](path string, handler RouteHandler[In, Out]) {
 	app.Route("GET", path, handler)
 }
 
-// Head register a new path handler for HEAD method.
-func (app *Application) Head(path string, handler Handler) {
+// Head registers a route handler for HEAD requests.
+func (app *Application) Head[In, Out any](path string, handler RouteHandler[In, Out]) {
 	app.Route("HEAD", path, handler)
 }
 
-// Post register a new path handler for POST method.
-func (app *Application) Post(path string, handler Handler) {
+// Post registers a route handler for POST requests.
+func (app *Application) Post[In, Out any](path string, handler RouteHandler[In, Out]) {
 	app.Route("POST", path, handler)
 }
 
-// Put register a new path handler for PUT method.
-func (app *Application) Put(path string, handler Handler) {
+// Put registers a route handler for PUT requests.
+func (app *Application) Put[In, Out any](path string, handler RouteHandler[In, Out]) {
 	app.Route("PUT", path, handler)
 }
 
-// Patch register a new path handler for PATCH method.
-func (app *Application) Patch(path string, handler Handler) {
+// Patch registers a route handler for PATCH requests.
+func (app *Application) Patch[In, Out any](path string, handler RouteHandler[In, Out]) {
 	app.Route("PATCH", path, handler)
 }
 
-// Delete register a new path handler for DELETE method.
-func (app *Application) Delete(path string, handler Handler) {
+// Delete registers a route handler for DELETE requests.
+func (app *Application) Delete[In, Out any](path string, handler RouteHandler[In, Out]) {
 	app.Route("DELETE", path, handler)
 }
 
-// Options register a new path handler for OPTIONS method.
-func (app *Application) Options(path string, handler Handler) {
+// Options registers a route handler for OPTIONS requests.
+func (app *Application) Options[In, Out any](path string, handler RouteHandler[In, Out]) {
 	app.Route("OPTIONS", path, handler)
 }
 
-// Trace register a new path handler for TRACE method.
-func (app *Application) Trace(path string, handler Handler) {
+// Trace registers a route handler for TRACE requests.
+func (app *Application) Trace[In, Out any](path string, handler RouteHandler[In, Out]) {
 	app.Route("TRACE", path, handler)
 }

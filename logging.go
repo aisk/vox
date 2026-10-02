@@ -17,7 +17,7 @@ func (writer *loggingResponseWriter) Write(b []byte) (int, error) {
 	return n, err
 }
 
-func logging(ctx *Context, req *Request, res *Response) {
+func logging(ctx *Context, req *BaseRequest, res *BaseResponse) {
 	if ctx.App.GetConfig("logging:disable") != "" {
 		ctx.Next()
 		return
