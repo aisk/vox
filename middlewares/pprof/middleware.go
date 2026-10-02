@@ -8,7 +8,7 @@ import (
 )
 
 // Middleware is vox's pprof middleware.
-func Middleware(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func Middleware(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 	if strings.HasPrefix(req.URL.Path, "/debug/pprof/cmdline") {
 		res.DontRespond = true
 		pprof.Cmdline(res.Writer, req.Request)

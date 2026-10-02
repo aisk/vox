@@ -8,8 +8,10 @@ import (
 	"strings"
 )
 
+type unsetBody struct{}
+
 var (
-	explicitSetBody   = struct{}{}
+	explicitSetBody   = unsetBody{}
 	explicitSetStatus = 0
 )
 
@@ -25,12 +27,13 @@ func htmlEscape(s string) string {
 	return htmlReplacer.Replace(s)
 }
 
-// A Response object contains all the information which will written to current
+// A BaseResponse object contains all the information which will written to current
 // HTTP client.
-type Response struct {
-	request *Request
+type BaseResponse struct {
+	request    *BaseRequest
+	redirected bool
 
-	// Don't write headers, status and body from Response struct to client. In
+	// Don't write headers, status and body from BaseResponse struct to client. In
 	// the case of you're using the go's origin http.Response.
 	DontRespond bool
 	// Writer is the raw http.ResponseWriter for current request. You should
@@ -38,14 +41,14 @@ type Response struct {
 	Writer http.ResponseWriter
 	// Body is the container for HTTP response's body.
 	Body interface{}
-	// The status code which will respond as the HTTP Response's status code.
+	// The status code which will respond as the HTTP response's status code.
 	// 200 will be used as the default value if not set.
 	Status int
 	// Headers which will be written to the response.
 	Header http.Header
 }
 
-func (response *Response) setImplicitContentType() {
+func (response *BaseResponse) setImplicitContentType() {
 	if response.Header.Get("Content-Type") != "" {
 		return
 	}
@@ -65,7 +68,8 @@ func (response *Response) setImplicitContentType() {
 var parseURL = url.Parse
 
 // Redirect request to another url.
-func (response *Response) Redirect(url string, code int) {
+func (response *BaseResponse) Redirect(url string, code int) {
+	response.redirected = true
 	request := response.request
 
 	if u, err := parseURL(url); err == nil {
@@ -99,6 +103,7 @@ func (response *Response) Redirect(url string, code int) {
 		response.Header.Set("Content-Type", "text/html; charset=utf-8")
 	}
 	response.Status = code
+	response.Body = ""
 
 	if request.Method == "GET" {
 		response.Body = "<a href=\"" + htmlEscape(url) + "\">" + http.StatusText(code) + "</a>.\n"
@@ -106,19 +111,19 @@ func (response *Response) Redirect(url string, code int) {
 }
 
 // SetCookie sets cookies on response.
-func (response *Response) SetCookie(cookie *http.Cookie) {
+func (response *BaseResponse) SetCookie(cookie *http.Cookie) {
 	if v := cookie.String(); v != "" {
 		response.Header.Add("Set-Cookie", v)
 	}
 }
 
-func (response *Response) setImplicitBody() {
+func (response *BaseResponse) setImplicitBody() {
 	if response.Body == explicitSetBody {
 		response.Body = http.StatusText(404)
 	}
 }
 
-func (response *Response) setImplicitStatus() {
+func (response *BaseResponse) setImplicitStatus() {
 	if response.Status != explicitSetStatus {
 		return
 	}
@@ -136,17 +141,30 @@ func (response *Response) setImplicitStatus() {
 	response.Status = 200
 }
 
-func (response *Response) setImplicit() {
+func (response *BaseResponse) setImplicit() {
 	response.setImplicitContentType()
 	response.setImplicitStatus()
 	response.setImplicitBody()
 }
 
-func createResponse(rw http.ResponseWriter) *Response {
-	return &Response{
+func createResponse(rw http.ResponseWriter) *BaseResponse {
+	return &BaseResponse{
 		Writer: rw,
 		Body:   explicitSetBody,
 		Status: explicitSetStatus,
 		Header: rw.Header(),
 	}
+}
+
+// Response contains a typed body and shared response metadata. On normal return,
+// Body is committed even when it has its zero value. Redirect and DontRespond
+// take precedence over Body.
+type Response[T any] struct {
+	*BaseResponse
+	Body T
+}
+
+// HasBody reports whether a response body has been set, including a zero value.
+func (response *BaseResponse) HasBody() bool {
+	return response.Body != explicitSetBody
 }

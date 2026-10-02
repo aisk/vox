@@ -1,20 +1,13 @@
 language: go
 
 go:
-  - "1.8"
-  - "1.9"
-  - "1.10"
-  - "1.11"
-  - "1.12"
-  - "1.13"
-  - "1.14"
-  - "tip"
+  - "1.27.x"
 
 before_install:
   - go get -t -v ./...
 
 script:
-- go test -v -race -coverprofile=coverage.txt -covermode=atomic
+- go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

@@ -5,28 +5,24 @@ nav_order: 5
 
 # Request
 
-Vox's `Request` object is built on top of Go's native [`net/http.Request`](https://golang.org/pkg/net/http/#Request).
-
-Actually, `vox.Request` [embeds](https://golang.org/doc/effective_go.html#embedding) a [`net/http.Request`](https://golang.org/pkg/net/http/#Request). So you can access any public field or method from [`net/http.Request`](https://golang.org/pkg/net/http/#Request) directly on a `vox.Request`.
-
-For example, you can access a request's HTTP header like this:
+Route handlers receive `*vox.Request[T]`. Its `Body` field has type `T`, decoded from JSON before the handler runs. Headers, URL, route `Params`, and other HTTP metadata are available through the embedded `*vox.BaseRequest`.
 
 ```go
-func ExampleHandler(ctx *vox.Context, req *vox.Request, res *vox.Response) {
-    fmt.Println("secret from request header: ", req.Header.Get("X-Secret"))
+type CreateUser struct {
+    Name string `json:"name"`
+}
+
+func createUser(ctx *vox.Context, req *vox.Request[CreateUser], res *vox.Response[string]) {
+    res.Body = "Hello, " + req.Body.Name
 }
 ```
 
-Additionally, `vox.Request` has some extra fields and methods that [`net/http.Request`](https://golang.org/pkg/net/http/#Request) does not provide.
+`application/json` and `application/*+json` media types are accepted, including parameters such as `charset=utf-8`. Unsupported or invalid content types yield
+415. Empty, malformed, type-incompatible JSON or extra data after the first JSON
+value yield 400. The route handler is not called on decode failure.
 
-For example, Vox has a `JSON` method to decode a JSON request body into Go values, with additional logic to validate the `Content-Type` header. If `Content-Type` does not start with "application/json", or a decode error occurs, this function returns an error and sets the response status code to 406.
+Decoding follows `encoding/json`: unknown fields are allowed, missing fields retain zero values, and `null` can produce nil pointers. Business validation and request size limits must be applied separately.
 
-```go
-func PostJSONHandler(ctx *vox.Context, req *vox.Request, res *vox.Response) {
-    body := map[string]string{}
-    if err := req.JSON(&body); err != nil {
-        return  // You do not need to set the response's status code, as vox has already set it.
-    }
-    // ...
-}
-```
+Use `Request[vox.NoBody]` to skip automatic decoding, regardless of HTTP method. The original stream remains accessible as `req.Request.Body`; the original HTTP request is `req.Request`. This supports uploads and manual decoding.
+
+Middleware receives `*vox.BaseRequest`, whose `Body` is the original stream. Its `JSON(&value)` helper decodes JSON and sets status 406 if the content type or body is invalid. Do not call it on an already decoded request: automatic decoding has consumed the stream.

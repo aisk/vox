@@ -11,7 +11,7 @@ func rawHandler(w http.ResponseWriter, _ *http.Request) {
 	io.WriteString(w, "Hello from a raw handler")
 }
 
-func voxHandler(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func voxHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 	res.Body = "Hello from a vox handler"
 }
 

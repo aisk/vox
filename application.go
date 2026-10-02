@@ -53,7 +53,7 @@ func (app *Application) Run(addr string) error {
 }
 
 func compose(middlewares []Handler) Handler {
-	return func(ctx *Context, req *Request, res *Response) {
+	return func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		next := func() {}
 		for i := len(middlewares) - 1; i >= 0; i-- {
 			func(i int, nenext func()) {

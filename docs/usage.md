@@ -30,7 +30,7 @@ func main() {
 	app := vox.New()
 
 	// custom middleware that adds an X-Response-Time header
-	app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Use(func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 		start := time.Now()
 		ctx.Next()
 		duration := time.Now().Sub(start)
@@ -38,12 +38,12 @@ func main() {
 	})
 
 	// router param
-	app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 		res.Body = "Hello, " + req.Params["name"] + "!"
 	})
 
 	// response
-	app.Get("/", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Get("/", func(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 		// get the query string
 		name := req.URL.Query().Get("name")
 		if name == "" {
@@ -65,7 +65,7 @@ import (
 	"github.com/aisk/vox"
 )
 
-func handler(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func handler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 	// Get the current request's HTTP method and put it to the result page.
 	res.Body = "HTTP Method is: " + req.Method
 }
@@ -102,7 +102,7 @@ import (
 
 func main() {
 	app := vox.New()
-	app.Route("*", "/health", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Route("*", "/health", func(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 		res.Body = "ok: " + req.Method
 	})
 	app.Run("localhost:3000")
@@ -143,7 +143,7 @@ import (
 	"github.com/aisk/vox"
 )
 
-func hello(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func hello(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 	name := req.Params["name"]
 	res.Body = "Hello, " + name + "!"
 }
@@ -164,7 +164,7 @@ import (
 	"github.com/aisk/vox"
 )
 
-func hello(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+func hello(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 	name := req.URL.Query().Get("name")
 	res.Body = "Hello, " + name + "!"
 }
@@ -185,8 +185,8 @@ import (
 	"github.com/aisk/vox"
 )
 
-func towel(ctx *vox.Context, req *vox.Request, res *vox.Response) {
-	// Set the response body, it can be a string, []byte, or anything that json.Marshal accepts.
+func towel(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
+	// Set the response body.
 	res.Body = "new towel is created!"
 	// Set the response status code.
 	res.Status = 201
@@ -201,59 +201,33 @@ func main() {
 }
 ```
 
-## Processing JSON request and send JSON response
+## Processing JSON requests and responses
+
+Go 1.27 or later is required. Route type arguments are inferred from the handler.
 
 ```go
 package main
 
-import (
-	"encoding/json"
-	"net/http"
-	"strings"
-
-	"github.com/aisk/vox"
-)
-
-type Error struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
+import "github.com/aisk/vox"
 
 type Towel struct {
-	Color string `json:"color"`
-	Size  string `json:"size"`
+    Color string `json:"color"`
+    Size  string `json:"size"`
 }
 
-func towel(ctx *vox.Context, req *vox.Request, res *vox.Response) {
-	if !strings.HasPrefix(req.Header.Get("Content-Type"), "application/json") {
-		res.Status = http.StatusUnsupportedMediaType // or just 415
-		// Set the body with a map, vox will marshal it to JSON automatically for you.
-		res.Body = map[string]interface{}{
-			"code":    1,
-			"message": "This is not a JSON request",
-		}
-		return
-	}
-
-	var t Towel
-	if err := json.NewDecoder(req.Body).Decode(&t); err != nil {
-		res.Status = http.StatusUnprocessableEntity // or just 422
-		res.Body = map[string]interface{}{
-			"code": 1,
-		}
-	}
-
-	// Set the body with a struct, vox will marshal it to JSON automatically for you.
-	res.Body = t
-	// Set the response status code.
-	res.Status = 201
-	// Set the response header.
-	res.Header.Set("Location", "/towels/42")
+func towel(ctx *vox.Context, req *vox.Request[Towel], res *vox.Response[Towel]) {
+    res.Body = req.Body
+    res.Status = 201
+    res.Header.Set("Location", "/towels/42")
 }
 
 func main() {
-	app := vox.New()
-	app.Post("/towels", towel)
-	app.Run("localhost:3000")
+    app := vox.New()
+    app.Post("/towels", towel)
+    app.Run("localhost:3000")
 }
 ```
+
+Inputs other than `vox.NoBody` are decoded as one JSON value before the handler runs. Unsupported content types produce 415; malformed, empty, or incompatible JSON and trailing data produce 400. JSON field validation is the application's responsibility. Use `Request[vox.NoBody]` for uploads or manual decoding, and read the original stream through `req.Request.Body`.
+
+See [Request](request.md) for decoding behavior and [Response](response.md) for output formats and status codes.

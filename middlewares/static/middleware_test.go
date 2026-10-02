@@ -112,7 +112,7 @@ func TestMiddlewareWillNotOverrideExistingResponse(t *testing.T) {
 
 	app := vox.New()
 	app.SetConfig("logging:disable", "true")
-	app.Get("/public/hello.txt", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Get("/public/hello.txt", func(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[any]) {
 		res.Body = "from route"
 	})
 	app.Use(Middleware("/public", root))

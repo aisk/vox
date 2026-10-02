@@ -30,7 +30,7 @@ func main() {
 	app := vox.New()
 	app.Use(pprof.Middleware)
 
-	app.Get("/", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Get("/", func(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 		res.Body = "Hello, World!"
 	})
 

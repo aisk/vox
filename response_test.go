@@ -30,7 +30,7 @@ func TestNewResponse(t *testing.T) {
 func TestRedirect(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Use(func(ctx *Context, req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		res.Redirect("/new_location", 302)
 	})
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
@@ -47,7 +47,7 @@ func TestRedirect(t *testing.T) {
 func TestSetCookie(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Use(func(ctx *Context, req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		res.SetCookie(&http.Cookie{Name: "foo", Value: "bar"})
 	})
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
@@ -61,7 +61,7 @@ func TestSetCookie(t *testing.T) {
 func TestResponseReader(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Use(func(ctx *Context, req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		res.Body = strings.NewReader("Hello io.Reader!")
 	})
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
@@ -92,7 +92,7 @@ func TestResponseReadCloser(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
 	rc := &MockReadCloser{strings.NewReader("Hello io.Reader!"), false}
-	app.Use(func(ctx *Context, req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		res.Body = rc
 	})
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
@@ -113,7 +113,7 @@ func TestResponseReadCloser(t *testing.T) {
 func TestResponseError(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
-	app.Use(func(ctx *Context, req *Request, res *Response) {
+	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		res.Body = errors.New("Error!")
 	})
 	r := httptest.NewRequest("GET", "http://test.com/", nil)

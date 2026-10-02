@@ -15,7 +15,7 @@ A Go web framework for humans, heavily inspired by [Koa](http://koajs.com).
 
 ### Installation
 
-Install with `go get`:
+Requires **Go 1.27 or later**. Install with `go get`:
 
 ```sh
 $ go get -u github.com/aisk/vox
@@ -33,11 +33,20 @@ import (
 	"github.com/aisk/vox"
 )
 
+type CreateUser struct {
+	Name string `json:"name"`
+}
+
+type User struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 func main() {
 	app := vox.New()
 
 	// custom middleware that adds an X-Response-Time header
-	app.Use(func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Use(func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 		start := time.Now()
 		ctx.Next()
 		duration := time.Now().Sub(start)
@@ -45,13 +54,20 @@ func main() {
 	})
 
 	// router param
-	app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request, res *vox.Response) {
+	app.Get("/hello/{name}", func(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
 		res.Body = "Hello, " + req.Params["name"] + "!"
+	})
+
+	app.Post("/users", func(ctx *vox.Context, req *vox.Request[CreateUser], res *vox.Response[User]) {
+		res.Status = 201
+		res.Body = User{ID: 1, Name: req.Body.Name}
 	})
 
 	app.Run("localhost:3000")
 }
 ```
+
+Route handlers declare their request and response body types in the function signature. Vox decodes request bodies as JSON; use `Request[vox.NoBody]` when no decoding is needed. Middleware receives `BaseRequest` and `BaseResponse`.
 
 ## More Docs
 
