@@ -3,7 +3,6 @@ package vox
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -75,7 +74,7 @@ func TestResponseReader(t *testing.T) {
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, r)
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fail()
 	}
@@ -106,7 +105,7 @@ func TestResponseReadCloser(t *testing.T) {
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, r)
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fail()
 	}
@@ -127,7 +126,7 @@ func TestResponseError(t *testing.T) {
 	r := httptest.NewRequest("GET", "http://test.com/", nil)
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, r)
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fail()
 	}

@@ -1,7 +1,7 @@
 package static
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -28,7 +28,7 @@ func TestMiddleware(t *testing.T) {
 	if w.Result().StatusCode != http.StatusOK {
 		t.Fatalf("expect StatusCode 200, got %d", w.Result().StatusCode)
 	}
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func TestMiddleware(t *testing.T) {
 	if w.Result().StatusCode != http.StatusOK {
 		t.Fatalf("expect StatusCode 200, got %d", w.Result().StatusCode)
 	}
-	body, err = ioutil.ReadAll(w.Result().Body)
+	body, err = io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func TestMiddlewareWithRootPrefix(t *testing.T) {
 	if w.Result().StatusCode != http.StatusOK {
 		t.Fatalf("expect StatusCode 200, got %d", w.Result().StatusCode)
 	}
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func TestMiddlewareWillNotOverrideExistingResponse(t *testing.T) {
 	if w.Result().StatusCode != http.StatusOK {
 		t.Fatalf("expect StatusCode 200, got %d", w.Result().StatusCode)
 	}
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fatal(err)
 	}
