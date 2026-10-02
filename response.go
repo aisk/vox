@@ -119,7 +119,7 @@ func (response *BaseResponse) SetCookie(cookie *http.Cookie) {
 
 func (response *BaseResponse) setImplicitBody() {
 	if response.Body == explicitSetBody {
-		response.Body = http.StatusText(404)
+		response.Body = http.StatusText(response.Status)
 	}
 }
 
@@ -157,8 +157,9 @@ func createResponse(rw http.ResponseWriter) *BaseResponse {
 }
 
 // Response contains a typed body and shared response metadata. On normal return,
-// Body is committed even when it has its zero value. Redirect and DontRespond
-// take precedence over Body.
+// Body is committed even when it has its zero value, unless the status is 400 or
+// above, where a zero Body is replaced by the status text. Redirect, DontRespond
+// and a body assigned to BaseResponse.Body take precedence over Body.
 type Response[T any] struct {
 	*BaseResponse
 	Body T

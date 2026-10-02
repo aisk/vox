@@ -47,12 +47,41 @@ func JSONHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Respon
 
 The `Status` field is an `int` type, which will be used as the HTTP response's status code.
 
-A route commits its body on normal return, including its zero value, and defaults to 200. An error body defaults to 500. `Response[vox.NoBody]` produces an empty body and defaults to 204. An unmatched request with no middleware response defaults to 404. HEAD, 204, and 304 responses omit the body.
+A route commits its body on normal return, including its zero value, and defaults to 200. A matched route never falls back to 404 on its own, so a handler that leaves a nil body responds with `null`. An error body defaults to 500. `Response[vox.NoBody]` produces an empty body and defaults to 204. An unmatched request with no middleware response defaults to 404. HEAD, 204, and 304 responses omit the body.
 
 ```go
 func StatusHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
     res.Status = 201
     res.Body = "created"
+}
+```
+
+## Errors
+
+`T` describes the successful response. When the status is 400 or above and `Body` still has its zero value, the body is not committed and the status text is written instead.
+
+```go
+func UserHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[User]) {
+    user, ok := findUser(req.Params["id"])
+    if !ok {
+        res.Status = 404 // responds with "Not Found"
+        return
+    }
+    res.Body = user
+}
+```
+
+To respond with a body that does not fit `T`, such as an error message or a stream, assign it to `res.BaseResponse.Body`. It accepts any value and takes precedence over `Body`.
+
+```go
+func UserHandler(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[User]) {
+    user, err := loadUser(req.Params["id"])
+    if err != nil {
+        res.Status = 502
+        res.BaseResponse.Body = map[string]string{"error": err.Error()}
+        return
+    }
+    res.Body = user
 }
 ```
 
