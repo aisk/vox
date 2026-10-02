@@ -1,7 +1,7 @@
 package vox
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http/httptest"
 	"testing"
 )
@@ -40,7 +40,7 @@ func TestBasicApplication(t *testing.T) {
 	if w.Result().Header.Get("foo") != "bar" {
 		t.Fail()
 	}
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fail()
 	}

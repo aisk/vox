@@ -1,7 +1,7 @@
 package vox
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -11,7 +11,7 @@ func TestRequestJSONWithInvalidContentHeader(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
 	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
-		data := make(map[string]interface{})
+		data := make(map[string]any)
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"
 		} else {
@@ -26,7 +26,7 @@ func TestRequestJSONWithInvalidContentHeader(t *testing.T) {
 	if w.Result().StatusCode != 415 {
 		t.Fail()
 	}
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fail()
 	}
@@ -39,7 +39,7 @@ func TestRequestJSONWithInvalidBody(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
 	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
-		data := make(map[string]interface{})
+		data := make(map[string]any)
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"
 		} else {
@@ -55,7 +55,7 @@ func TestRequestJSONWithInvalidBody(t *testing.T) {
 	if w.Result().StatusCode != 400 {
 		t.Fail()
 	}
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fail()
 	}
@@ -68,7 +68,7 @@ func TestRequestJSON(t *testing.T) {
 	app := New()
 	app.SetConfig("logging:disable", "true")
 	app.Use(func(ctx *Context, req *BaseRequest, res *BaseResponse) {
-		data := make(map[string]interface{})
+		data := make(map[string]any)
 		if err := req.JSON(&data); err != nil {
 			res.Body = "error"
 		} else {
@@ -84,7 +84,7 @@ func TestRequestJSON(t *testing.T) {
 	if w.Result().StatusCode != 200 {
 		t.Fail()
 	}
-	body, err := ioutil.ReadAll(w.Result().Body)
+	body, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Fail()
 	}

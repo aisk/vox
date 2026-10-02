@@ -12,8 +12,8 @@ import (
 type unsetBody struct{}
 
 var (
-	explicitSetBody   = unsetBody{}
-	explicitSetStatus = 0
+	bodyNotSet   = unsetBody{}
+	statusNotSet = 0
 )
 
 var htmlReplacer = strings.NewReplacer(
@@ -41,7 +41,7 @@ type BaseResponse struct {
 	// assign the Body / Status / Header value instead of using this field.
 	Writer http.ResponseWriter
 	// Body is the container for HTTP response's body.
-	Body interface{}
+	Body any
 	// The status code which will respond as the HTTP response's status code.
 	// 200 will be used as the default value if not set.
 	Status int
@@ -54,7 +54,7 @@ func (response *BaseResponse) setImplicitContentType() {
 		return
 	}
 
-	if response.Body == explicitSetBody {
+	if response.Body == bodyNotSet {
 		return
 	}
 
@@ -122,17 +122,17 @@ func (response *BaseResponse) SetCookie(cookie *http.Cookie) {
 }
 
 func (response *BaseResponse) setImplicitBody() {
-	if response.Body == explicitSetBody {
+	if response.Body == bodyNotSet {
 		response.Body = http.StatusText(response.Status)
 	}
 }
 
 func (response *BaseResponse) setImplicitStatus() {
-	if response.Status != explicitSetStatus {
+	if response.Status != statusNotSet {
 		return
 	}
 
-	if response.Body == explicitSetBody {
+	if response.Body == bodyNotSet {
 		response.Status = 404
 		return
 	}
@@ -154,8 +154,8 @@ func (response *BaseResponse) setImplicit() {
 func createResponse(rw http.ResponseWriter) *BaseResponse {
 	return &BaseResponse{
 		Writer: rw,
-		Body:   explicitSetBody,
-		Status: explicitSetStatus,
+		Body:   bodyNotSet,
+		Status: statusNotSet,
 		Header: rw.Header(),
 	}
 }
@@ -171,5 +171,5 @@ type Response[T any] struct {
 
 // HasBody reports whether a response body has been set, including a zero value.
 func (response *BaseResponse) HasBody() bool {
-	return response.Body != explicitSetBody
+	return response.Body != bodyNotSet
 }
