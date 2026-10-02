@@ -1,18 +1,6 @@
----
-title: Static Files
-parent: Bundled Middleware
-nav_order: 1
----
-
 # Static Files
-{: .no_toc }
 
 The `static` package serves files from a local directory under a URL prefix.
-
-1. TOC
-{:toc}
-
----
 
 ## Usage
 

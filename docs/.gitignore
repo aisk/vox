@@ -1,4 +1,3 @@
-_site/
-.jekyll-cache/
-.bundle/
-vendor/
+node_modules/
+.vitepress/dist/
+.vitepress/cache/

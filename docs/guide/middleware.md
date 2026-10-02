@@ -1,20 +1,6 @@
----
-title: Middleware
-parent: Guide
-nav_order: 3
-redirect_from:
-  - /docs/middleware
----
-
 # Middleware
-{: .no_toc }
 
 Middleware is the core concept of Vox. An application is a chain of middleware with the router at its end, and every request passes through the chain.
-
-1. TOC
-{:toc}
-
----
 
 ## Signature
 
@@ -156,7 +142,7 @@ The request is only matched to a route when the chain reaches the router, so som
 | `res.Status` | `0` | the status set explicitly, or `0` when it was left to the default |
 | `res.Header` | writable | writable |
 
-A status of `0` means "not set yet". The default (200, 204, 404 or 500, see [Response]({% link guide/response.md %}#status)) is filled in by `respond` after your middleware has returned.
+A status of `0` means "not set yet". The default (200, 204, 404 or 500, see [Response](./response.md#status)) is filled in by `respond` after your middleware has returned.
 
 ### Inspecting and replacing the response
 
@@ -187,7 +173,7 @@ func notFound(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 
 ## Sharing data with handlers
 
-Middleware passes values to later middleware and to route handlers through the context. See [Context]({% link guide/context.md %}#passing-values).
+Middleware passes values to later middleware and to route handlers through the context. See [Context](./context.md#passing-values).
 
 ## Built-in middleware
 
@@ -199,11 +185,11 @@ Two middleware are part of every application and always run first.
 127.0.0.1:53412 - - [03/Oct/2026:10:00:00 +0000] "GET /hello/gopher HTTP/1.1" 200 14
 ```
 
-The fields are the remote address, the user from the URL (normally `-`), the time, the request line, the status and the number of body bytes written. Turn it off with the `logging:disable` setting described in [Configuration]({% link guide/configuration.md %}).
+The fields are the remote address, the user from the URL (normally `-`), the time, the request line, the status and the number of body bytes written. Turn it off with the `logging:disable` setting described in [Configuration](./configuration.md).
 
-`respond` writes the response to the client once the rest of the chain has returned. It applies the default status and content type, then writes the body according to its type. See [Response]({% link guide/response.md %}). A handler or middleware that writes to the connection itself sets `res.DontRespond` to make `respond` step aside.
+`respond` writes the response to the client once the rest of the chain has returned. It applies the default status and content type, then writes the body according to its type. See [Response](./response.md). A handler or middleware that writes to the connection itself sets `res.DontRespond` to make `respond` step aside.
 
-Packages with optional middleware are listed under [Bundled Middleware]({% link middlewares/index.md %}).
+Packages with optional middleware are listed under [Bundled Middleware](../middlewares/index.md).
 
 ## Using net/http middleware
 

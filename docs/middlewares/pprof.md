@@ -1,20 +1,6 @@
----
-title: Pprof
-parent: Bundled Middleware
-nav_order: 2
-redirect_from:
-  - /docs/pprof
----
-
 # Pprof
-{: .no_toc }
 
 The `pprof` package exposes the profiling endpoints of Go's [`net/http/pprof`](https://pkg.go.dev/net/http/pprof) through a Vox middleware.
-
-1. TOC
-{:toc}
-
----
 
 ## Usage
 

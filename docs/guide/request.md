@@ -1,20 +1,6 @@
----
-title: Request
-parent: Guide
-nav_order: 5
-redirect_from:
-  - /docs/request
----
-
 # Request
-{: .no_toc }
 
 Route handlers receive a `*vox.Request[T]` and middleware receives a `*vox.BaseRequest`. Both give access to the underlying `*http.Request`.
-
-1. TOC
-{:toc}
-
----
 
 ## The request types
 
@@ -54,7 +40,7 @@ func inspect(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[m
 }
 ```
 
-Path parameters are described in [Routing]({% link guide/routing.md %}#path-parameters). Cookies are read with the standard method:
+Path parameters are described in [Routing](./routing.md#path-parameters). Cookies are read with the standard method:
 
 ```go
 cookie, err := req.Cookie("session")
@@ -191,5 +177,5 @@ func audit(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 }
 ```
 
-{: .warning }
-A request body can be read only once. Do not call `JSON` for a request whose route also decodes the body, and do not call it on a request that was already decoded.
+> [!WARNING]
+> A request body can be read only once. Do not call `JSON` for a request whose route also decodes the body, and do not call it on a request that was already decoded.

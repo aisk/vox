@@ -1,20 +1,6 @@
----
-title: Routing
-parent: Guide
-nav_order: 1
-redirect_from:
-  - /docs/usage
----
-
 # Routing
-{: .no_toc }
 
 A route binds an HTTP method and a path pattern to a handler.
-
-1. TOC
-{:toc}
-
----
 
 ## Registering routes
 
@@ -128,7 +114,7 @@ A pattern is more specific than another when it matches a strict subset of the o
 
 ## Unmatched requests
 
-When no route matches, the response is `404 Not Found`, unless a middleware provides a response. See [Error Handling]({% link guide/errors.md %}#not-found) to customize it.
+When no route matches, the response is `404 Not Found`, unless a middleware provides a response. See [Error Handling](./errors.md#not-found) to customize it.
 
 Vox keeps matching simple, which makes it differ from `http.ServeMux` in a few places:
 
@@ -158,6 +144,6 @@ func main() {
 }
 ```
 
-Handlers can be functions, closures or methods. [Route Handlers]({% link guide/handlers.md %}#handlers-with-dependencies) shows how to give them access to shared dependencies.
+Handlers can be functions, closures or methods. [Route Handlers](./handlers.md#handlers-with-dependencies) shows how to give them access to shared dependencies.
 
-Routes can be registered before or after `app.Use` calls. The router always runs after all middleware, as described in [Middleware]({% link guide/middleware.md %}#execution-order).
+Routes can be registered before or after `app.Use` calls. The router always runs after all middleware, as described in [Middleware](./middleware.md#execution-order).

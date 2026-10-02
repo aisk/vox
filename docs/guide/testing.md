@@ -1,18 +1,6 @@
----
-title: Testing
-parent: Guide
-nav_order: 10
----
-
 # Testing
-{: .no_toc }
 
 An application is an `http.Handler`, so the standard [`net/http/httptest`](https://pkg.go.dev/net/http/httptest) package is all you need to test it.
-
-1. TOC
-{:toc}
-
----
 
 ## Structuring for tests
 

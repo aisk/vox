@@ -1,18 +1,6 @@
----
-title: Configuration
-parent: Guide
-nav_order: 8
----
-
 # Configuration
-{: .no_toc }
 
 An application carries a small set of string settings. Vox uses them for its own options, and you can use them for yours.
-
-1. TOC
-{:toc}
-
----
 
 ## Setting and reading values
 
@@ -34,7 +22,7 @@ Configure the application before it starts serving. Settings are not synchronize
 | `request:max-body-size` | `1048576` | The maximum size in bytes of a JSON request body. Larger bodies are rejected with 413. `0` disables the limit. |
 | `logging:disable` | unset | Any non-empty value turns off the built-in access log. |
 
-`request:max-body-size` must be a non-negative integer. `SetConfig` panics on any other value, so a typo is caught at startup. The limit applies to automatic JSON decoding and to `BaseRequest.JSON`. See [Request]({% link guide/request.md %}#body-size-limit).
+`request:max-body-size` must be a non-negative integer. `SetConfig` panics on any other value, so a typo is caught at startup. The limit applies to automatic JSON decoding and to `BaseRequest.JSON`. See [Request](./request.md#body-size-limit).
 
 `logging:disable` only checks whether the value is empty, so `"false"` disables the log as well. Leave the key unset to keep logging on.
 
@@ -56,7 +44,7 @@ app.Get("/version", func(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vo
 
 Prefix your keys, as in `app:version`, to keep them apart from the built-in ones.
 
-Settings are a convenience for simple string values. For structured configuration or dependencies such as a database handle, pass them to your handlers directly, as shown in [Route Handlers]({% link guide/handlers.md %}#handlers-with-dependencies).
+Settings are a convenience for simple string values. For structured configuration or dependencies such as a database handle, pass them to your handlers directly, as shown in [Route Handlers](./handlers.md#handlers-with-dependencies).
 
 ## Reading from the environment
 

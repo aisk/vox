@@ -1,17 +1,6 @@
----
-title: Getting Started
-nav_order: 2
----
-
 # Getting Started
-{: .no_toc }
 
 This page walks through a small application: a plain text route, a JSON route and a middleware.
-
-1. TOC
-{:toc}
-
----
 
 ## Requirements
 
@@ -111,7 +100,7 @@ HTTP/1.1 415 Unsupported Media Type
 content type must be application/json
 ```
 
-See [Request]({% link guide/request.md %}) for the decoding rules and [Response]({% link guide/response.md %}) for how each body type is written.
+See [Request](./guide/request.md) for the decoding rules and [Response](./guide/response.md) for how each body type is written.
 
 ## A middleware
 
@@ -129,8 +118,8 @@ app.Use(func(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 
 ## Next steps
 
-- [Routing]({% link guide/routing.md %}) covers HTTP methods, path patterns and precedence.
-- [Route Handlers]({% link guide/handlers.md %}) explains how to choose the input and output types.
-- [Middleware]({% link guide/middleware.md %}) explains the chain in detail.
-- [Error Handling]({% link guide/errors.md %}) shows how to report failures.
-- [Recipes]({% link recipes.md %}) has ready to use snippets for CORS, authentication, panic recovery and more.
+- [Routing](./guide/routing.md) covers HTTP methods, path patterns and precedence.
+- [Route Handlers](./guide/handlers.md) explains how to choose the input and output types.
+- [Middleware](./guide/middleware.md) explains the chain in detail.
+- [Error Handling](./guide/errors.md) shows how to report failures.
+- [Recipes](./recipes.md) has ready to use snippets for CORS, authentication, panic recovery and more.

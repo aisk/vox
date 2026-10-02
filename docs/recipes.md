@@ -1,17 +1,6 @@
----
-title: Recipes
-nav_order: 5
----
-
 # Recipes
-{: .no_toc }
 
 Short, self-contained solutions to common tasks. Each one can be copied into an application and adapted.
-
-1. TOC
-{:toc}
-
----
 
 ## Health check
 
@@ -211,7 +200,7 @@ func download(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[
 }
 ```
 
-To serve a whole directory, use the [Static Files]({% link middlewares/static.md %}) middleware.
+To serve a whole directory, use the [Static Files](./middlewares/static.md) middleware.
 
 ## Structured access log
 
@@ -261,8 +250,8 @@ A Vox middleware is not the right place for this, because the default status is 
 
 These tasks are covered in the guide:
 
-- [Recovering from panics]({% link guide/errors.md %}#panics)
-- [A custom 404 response]({% link guide/errors.md %}#not-found)
-- [Formatting all errors as JSON]({% link guide/errors.md %}#formatting-errors-in-one-place)
-- [Graceful shutdown]({% link guide/running.md %}#graceful-shutdown)
-- [Mounting an application under a prefix]({% link guide/running.md %}#mounting-under-a-prefix)
+- [Recovering from panics](./guide/errors.md#panics)
+- [A custom 404 response](./guide/errors.md#not-found)
+- [Formatting all errors as JSON](./guide/errors.md#formatting-errors-in-one-place)
+- [Graceful shutdown](./guide/running.md#graceful-shutdown)
+- [Mounting an application under a prefix](./guide/running.md#mounting-under-a-prefix)

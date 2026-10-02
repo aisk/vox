@@ -73,11 +73,11 @@ Route handlers declare their request and response body types in the function sig
 
 The full documentation lives at https://aisk.github.io/vox/.
 
-- [Getting Started](https://aisk.github.io/vox/getting-started/)
-- [Routing](https://aisk.github.io/vox/guide/routing/), [Route Handlers](https://aisk.github.io/vox/guide/handlers/) and [Middleware](https://aisk.github.io/vox/guide/middleware/)
-- [Request](https://aisk.github.io/vox/guide/request/), [Response](https://aisk.github.io/vox/guide/response/) and [Error Handling](https://aisk.github.io/vox/guide/errors/)
-- [Static Files](https://aisk.github.io/vox/middlewares/static/) and [Pprof](https://aisk.github.io/vox/middlewares/pprof/) middleware
-- [Recipes](https://aisk.github.io/vox/recipes/)
+- [Getting Started](https://aisk.github.io/vox/getting-started)
+- [Routing](https://aisk.github.io/vox/guide/routing), [Route Handlers](https://aisk.github.io/vox/guide/handlers) and [Middleware](https://aisk.github.io/vox/guide/middleware)
+- [Request](https://aisk.github.io/vox/guide/request), [Response](https://aisk.github.io/vox/guide/response) and [Error Handling](https://aisk.github.io/vox/guide/errors)
+- [Static Files](https://aisk.github.io/vox/middlewares/static) and [Pprof](https://aisk.github.io/vox/middlewares/pprof) middleware
+- [Recipes](https://aisk.github.io/vox/recipes)
 
 ## Need Support?
 

@@ -1,18 +1,6 @@
----
-title: Route Handlers
-parent: Guide
-nav_order: 2
----
-
 # Route Handlers
-{: .no_toc }
 
 A route handler is a function that receives a typed request and fills in a typed response.
-
-1. TOC
-{:toc}
-
----
 
 ## Signature
 
@@ -20,9 +8,9 @@ A route handler is a function that receives a typed request and fills in a typed
 func(ctx *vox.Context, req *vox.Request[In], res *vox.Response[Out])
 ```
 
-- `ctx` is the [Context]({% link guide/context.md %}) of the current request.
-- `req` is the [Request]({% link guide/request.md %}). `req.Body` has type `In`.
-- `res` is the [Response]({% link guide/response.md %}). `res.Body` has type `Out`.
+- `ctx` is the [Context](./context.md) of the current request.
+- `req` is the [Request](./request.md). `req.Body` has type `In`.
+- `res` is the [Response](./response.md). `res.Body` has type `Out`.
 
 A handler has no return value. It reports its result by assigning to `res` and returning.
 
@@ -52,10 +40,10 @@ func createUser(ctx *vox.Context, req *vox.Request[CreateUser], res *vox.Respons
 | A struct, map, slice or other JSON compatible type | The body is decoded from JSON before the handler runs. |
 | A pointer to one of those | Same, and `req.Body` is never nil when the handler runs. |
 
-{: .warning }
-Any input type other than `vox.NoBody` makes a JSON body mandatory. A request without one is rejected with 415 or 400, whatever its method. Routes that take no body, which includes most `GET` and `DELETE` routes, should use `Request[vox.NoBody]`.
+> [!WARNING]
+> Any input type other than `vox.NoBody` makes a JSON body mandatory. A request without one is rejected with 415 or 400, whatever its method. Routes that take no body, which includes most `GET` and `DELETE` routes, should use `Request[vox.NoBody]`.
 
-`vox.NoBody` is also the way to accept forms, uploads and other non JSON bodies. See [Request]({% link guide/request.md %}#forms-and-uploads).
+`vox.NoBody` is also the way to accept forms, uploads and other non JSON bodies. See [Request](./request.md#forms-and-uploads).
 
 ## Choosing the output type
 
@@ -68,7 +56,7 @@ Any input type other than `vox.NoBody` makes a JSON body mandatory. A request wi
 | Anything else | Encoded as JSON with `Content-Type: application/json`. |
 | `any` | Decided at run time by the value you assign, following the rows above. |
 
-The output type describes the successful response. Failures do not have to fit it, as [Error Handling]({% link guide/errors.md %}) explains.
+The output type describes the successful response. Failures do not have to fit it, as [Error Handling](./errors.md) explains.
 
 ## Lifecycle
 
@@ -121,7 +109,7 @@ users := &UserHandlers{DB: db}
 app.Get("/users/{id}", users.Show)
 ```
 
-Values that change per request, such as the authenticated user, belong in the [Context]({% link guide/context.md %}#passing-values).
+Values that change per request, such as the authenticated user, belong in the [Context](./context.md#passing-values).
 
 ## Do not call Next
 

@@ -1,20 +1,6 @@
----
-title: Context
-parent: Guide
-nav_order: 4
-redirect_from:
-  - /docs/context
----
-
 # Context
-{: .no_toc }
 
 Every middleware and route handler receives a `*vox.Context`. One context is created per request and shared by the whole chain.
-
-1. TOC
-{:toc}
-
----
 
 ## Fields
 
@@ -78,8 +64,8 @@ func profile(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[U
 
 As with any `context.WithValue` call, use an unexported key type to avoid collisions between packages.
 
-{: .note }
-Always read values from `ctx`. The context returned by `req.Context()` belongs to the original `*http.Request` and does not see values or deadlines added to `ctx.Context`.
+> [!NOTE]
+> Always read values from `ctx`. The context returned by `req.Context()` belongs to the original `*http.Request` and does not see values or deadlines added to `ctx.Context`.
 
 ## Deadlines
 
@@ -100,7 +86,7 @@ The deadline does not interrupt a handler by itself. It takes effect in code tha
 
 ## App
 
-`ctx.App` gives handlers access to the application, most commonly to read [configuration]({% link guide/configuration.md %}):
+`ctx.App` gives handlers access to the application, most commonly to read [configuration](./configuration.md):
 
 ```go
 func version(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[string]) {
@@ -120,4 +106,4 @@ func logger(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 }
 ```
 
-Call `ctx.Next()` at most once per middleware. `Next` is for middleware only: a route handler is the end of the chain and simply returns, and calling `Next` from one panics. See [Middleware]({% link guide/middleware.md %}) for the full picture.
+Call `ctx.Next()` at most once per middleware. `Next` is for middleware only: a route handler is the end of the chain and simply returns, and calling `Next` from one panics. See [Middleware](./middleware.md) for the full picture.

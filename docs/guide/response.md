@@ -1,20 +1,6 @@
----
-title: Response
-parent: Guide
-nav_order: 6
-redirect_from:
-  - /docs/response
----
-
 # Response
-{: .no_toc }
 
 Route handlers receive a `*vox.Response[T]` and middleware receives a `*vox.BaseResponse`. Handlers describe the response by assigning fields. Vox writes it to the client after the handler and the middleware around it have returned.
-
-1. TOC
-{:toc}
-
----
 
 ## The response types
 
@@ -155,7 +141,7 @@ func showUser(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[
 }
 ```
 
-[Error Handling]({% link guide/errors.md %}) covers these patterns in more detail.
+[Error Handling](./errors.md) covers these patterns in more detail.
 
 ## Redirect
 

@@ -1,18 +1,6 @@
----
-title: Error Handling
-parent: Guide
-nav_order: 7
----
-
 # Error Handling
-{: .no_toc }
 
 Vox has no special error type or error return value. A failure is a response like any other: a status and, optionally, a body.
-
-1. TOC
-{:toc}
-
----
 
 ## Errors in route handlers
 
@@ -62,8 +50,8 @@ func showUser(ctx *vox.Context, req *vox.Request[vox.NoBody], res *vox.Response[
 }
 ```
 
-{: .warning }
-The message of an internal error can reveal details you do not want to expose. Prefer the middleware below, which logs the error and sends a generic message.
+> [!WARNING]
+> The message of an internal error can reveal details you do not want to expose. Prefer the middleware below, which logs the error and sends a generic message.
 
 ## Formatting errors in one place
 
@@ -93,7 +81,7 @@ Handlers then report failures by assigning an error and, when 500 is not appropr
 
 ## Request decoding errors
 
-When a JSON request body is rejected, the route handler is not called. Vox responds with status 400, 413 or 415 and a short plain text message. The cases are listed in [Request]({% link guide/request.md %}#json-bodies).
+When a JSON request body is rejected, the route handler is not called. Vox responds with status 400, 413 or 415 and a short plain text message. The cases are listed in [Request](./request.md#json-bodies).
 
 Middleware sees the failure as a `*vox.DecodeError`. Since `*vox.DecodeError` implements `error` and carries its status, the `jsonErrors` middleware above already converts it. To handle it separately, check for the type:
 
@@ -146,8 +134,8 @@ func recovery(ctx *vox.Context, req *vox.BaseRequest, res *vox.BaseResponse) {
 
 It catches panics from the middleware registered after it and from route handlers, so register it early.
 
-{: .note }
-Writing the response happens outside of your middleware, in the built-in `respond` middleware. A failure at that stage, such as a body value that cannot be encoded as JSON, is not caught by a recovery middleware.
+> [!NOTE]
+> Writing the response happens outside of your middleware, in the built-in `respond` middleware. A failure at that stage, such as a body value that cannot be encoded as JSON, is not caught by a recovery middleware.
 
 ## Putting it together
 

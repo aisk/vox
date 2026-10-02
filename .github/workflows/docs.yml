@@ -29,23 +29,25 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v7
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
+    - name: Set up Node
+      uses: actions/setup-node@v7
       with:
-        ruby-version: '3.4'
-        bundler-cache: true
-        working-directory: docs
+        node-version: 24
+        cache: npm
+        cache-dependency-path: docs/package-lock.json
+
+    - name: Install dependencies
+      working-directory: docs
+      run: npm ci
 
     - name: Build site
       working-directory: docs
-      run: bundle exec jekyll build
-      env:
-        JEKYLL_ENV: production
+      run: npm run build
 
     - name: Upload site
       uses: actions/upload-pages-artifact@v5
       with:
-        path: docs/_site
+        path: docs/.vitepress/dist
       if: github.event_name != 'pull_request'
 
   deploy:

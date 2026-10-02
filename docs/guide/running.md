@@ -1,18 +1,4 @@
----
-title: Running
-parent: Guide
-nav_order: 9
-redirect_from:
-  - /docs/run
----
-
 # Running Your Application
-{: .no_toc }
-
-1. TOC
-{:toc}
-
----
 
 ## Run
 
@@ -117,7 +103,7 @@ http.ListenAndServe("localhost:3000", mux)
 
 ### Calling an http.Handler from Vox
 
-The other direction works too. See [Writing the response yourself]({% link guide/response.md %}#writing-the-response-yourself).
+The other direction works too. See [Writing the response yourself](./response.md#writing-the-response-yourself).
 
 ## Behind a reverse proxy
 
@@ -125,4 +111,4 @@ Vox reports the remote address of the TCP connection, both in `req.RemoteAddr` a
 
 ## Profiling
 
-To expose runtime profiling endpoints, see [Pprof]({% link middlewares/pprof.md %}).
+To expose runtime profiling endpoints, see [Pprof](../middlewares/pprof.md).
