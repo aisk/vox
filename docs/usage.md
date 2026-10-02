@@ -228,6 +228,6 @@ func main() {
 }
 ```
 
-Inputs other than `vox.NoBody` are decoded as one JSON value before the handler runs. Unsupported content types produce 415; malformed, empty, or incompatible JSON and trailing data produce 400. JSON field validation is the application's responsibility. Use `Request[vox.NoBody]` for uploads or manual decoding, and read the original stream through `req.Request.Body`.
+Inputs other than `vox.NoBody` are decoded as one JSON value before the handler runs. Unsupported content types produce 415; bodies over the size limit produce 413; malformed, empty, `null`, or incompatible JSON and trailing data produce 400. JSON field validation is the application's responsibility. Use `Request[vox.NoBody]` for uploads or manual decoding, and read the original stream through `req.Request.Body`.
 
 See [Request](request.md) for decoding behavior and [Response](response.md) for output formats and status codes.

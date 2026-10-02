@@ -1,12 +1,8 @@
 package vox
 
 import (
-	"encoding/json"
-	"io"
-	"mime"
 	"net/http"
 	"reflect"
-	"strings"
 )
 
 // routeHandler handles route matching and parameter extraction
@@ -41,24 +37,7 @@ func (app *Application) Route[In, Out any](method, path string, handler RouteHan
 	app.registerRoute(method, path, func(ctx *Context, req *BaseRequest, res *BaseResponse) {
 		var body In
 		if _, skip := any(body).(NoBody); !skip {
-			mediaType, _, err := mime.ParseMediaType(req.Header.Get("Content-Type"))
-			if err != nil || (mediaType != "application/json" &&
-				!(strings.HasPrefix(mediaType, "application/") && strings.HasSuffix(mediaType, "+json"))) {
-				res.Status = http.StatusUnsupportedMediaType
-				res.Body = http.StatusText(res.Status)
-				return
-			}
-			decoder := json.NewDecoder(req.Body)
-			if err := decoder.Decode(&body); err != nil {
-				res.Status = http.StatusBadRequest
-				res.Body = http.StatusText(res.Status)
-				return
-			}
-			// Require exactly one JSON value, allowing trailing whitespace.
-			var extra any
-			if err := decoder.Decode(&extra); err != io.EOF {
-				res.Status = http.StatusBadRequest
-				res.Body = http.StatusText(res.Status)
+			if req.JSON(&body) != nil {
 				return
 			}
 		}

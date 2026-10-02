@@ -1,14 +1,28 @@
 package vox
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"mime"
 	"net/http"
 	"strings"
 )
 
-// ErrNotAcceptable is the error returns when vox found the reqeust is not acceptable.
-var ErrNotAcceptable = errors.New("content is not acceptable")
+// A DecodeError describes why a JSON request body was rejected. Its message is
+// safe to send to the client; Err holds the underlying error, if any.
+type DecodeError struct {
+	// Status is the HTTP status code the failure maps to.
+	Status  int
+	Message string
+	Err     error
+}
+
+func (e *DecodeError) Error() string { return e.Message }
+
+func (e *DecodeError) Unwrap() error { return e.Err }
 
 // A BaseRequest object contains all the information from current HTTP client.
 //
@@ -25,28 +39,73 @@ type BaseRequest struct {
 	// Multiple parameters with same key is invalid and will be ignored.
 	Params map[string]string
 
+	app      *Application
 	response *BaseResponse
 }
 
 func createRequest(raw *http.Request) *BaseRequest {
 	return &BaseRequest{
-		raw,
-		make(map[string]string),
-		nil,
+		Request: raw,
+		Params:  make(map[string]string),
 	}
 }
 
-// JSON is a helper to decode JSON request body to go value, with additional functionality to check the content type header from the request. If the content type header do not starts with "application/json" or decode errors, this function will return an error and set the response status code to 406.
-func (request *BaseRequest) JSON(v interface{}) error {
-	if !strings.HasPrefix(request.Header.Get("content-type"), "application/json") {
-		request.response.Status = 406
-		return ErrNotAcceptable
+// JSON decodes the JSON request body into v. Route handlers with an input type
+// other than NoBody have it called for them. On failure it sets the response
+// status and body to a *DecodeError and returns it.
+func (request *BaseRequest) JSON(v any) error {
+	if err := request.decodeJSON(v); err != nil {
+		request.response.Status = err.Status
+		request.response.Body = err
+		return err
 	}
-	err := json.NewDecoder(request.Body).Decode(v)
+	return nil
+}
+
+// decodeJSON reads exactly one JSON value other than null from the request
+// body into v.
+func (request *BaseRequest) decodeJSON(v any) *DecodeError {
+	mediaType, _, err := mime.ParseMediaType(request.Header.Get("Content-Type"))
+	if err != nil || (mediaType != "application/json" &&
+		!(strings.HasPrefix(mediaType, "application/") && strings.HasSuffix(mediaType, "+json"))) {
+		return &DecodeError{http.StatusUnsupportedMediaType, "content type must be application/json", err}
+	}
+
+	body := request.Body
+	if limit := request.app.maxBodySize; limit > 0 {
+		body = http.MaxBytesReader(request.response.Writer, body, limit)
+	}
+	data, err := io.ReadAll(body)
 	if err != nil {
-		request.response.Status = 406
+		var tooLarge *http.MaxBytesError
+		if errors.As(err, &tooLarge) {
+			return &DecodeError{http.StatusRequestEntityTooLarge, "request body is too large", err}
+		}
+		return &DecodeError{http.StatusBadRequest, "request body could not be read", err}
 	}
-	return err
+
+	switch trimmed := bytes.TrimSpace(data); {
+	case len(trimmed) == 0:
+		return &DecodeError{http.StatusBadRequest, "request body is empty", nil}
+	case string(trimmed) == "null":
+		return &DecodeError{http.StatusBadRequest, "request body must not be null", nil}
+	}
+
+	if err := json.Unmarshal(data, v); err != nil {
+		message := "request body is not valid JSON"
+		var syntaxErr *json.SyntaxError
+		var typeErr *json.UnmarshalTypeError
+		switch {
+		case errors.As(err, &syntaxErr):
+			message = fmt.Sprintf("malformed JSON at offset %d", syntaxErr.Offset)
+		case errors.As(err, &typeErr) && typeErr.Field != "":
+			message = fmt.Sprintf("invalid type for field %q", typeErr.Field)
+		case errors.As(err, &typeErr):
+			message = "invalid type for request body"
+		}
+		return &DecodeError{http.StatusBadRequest, message, err}
+	}
+	return nil
 }
 
 // NoBody disables automatic request decoding. As an output type it produces an

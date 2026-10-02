@@ -182,38 +182,55 @@ func TestRouteBodyTypes(t *testing.T) {
 }
 
 func TestRouteDecode(t *testing.T) {
+	const unsupported = "content type must be application/json"
 	cases := []struct {
 		name, contentType, body string
 		status                  int
+		want                    string
 	}{
-		{"valid", "application/json", `{"name":"Ada"}`, 200},
-		{"suffix", "application/problem+json", `{"name":"Ada"}`, 200},
-		{"whitespace", "application/json", "{\"name\":\"Ada\"}\n ", 200},
-		{"missing type", "", `{}`, 415},
-		{"wrong type", "text/plain", `{}`, 415},
-		{"invalid type", "application/json-invalid", `{}`, 415},
-		{"bad parameter", "application/json; charset", `{}`, 415},
-		{"empty", "application/json", "", 400},
-		{"syntax", "application/json", `{`, 400},
-		{"field type", "application/json", `{"name":42}`, 400},
-		{"second value", "application/json", `{} {}`, 400},
-		{"trailing garbage", "application/json", `{} nope`, 400},
+		{"valid", "application/json", `{"name":"Ada"}`, 200, "Ada"},
+		{"suffix", "application/problem+json", `{"name":"Ada"}`, 200, "Ada"},
+		{"whitespace", "application/json", "{\"name\":\"Ada\"}\n ", 200, "Ada"},
+		{"missing type", "", `{}`, 415, unsupported},
+		{"wrong type", "text/plain", `{}`, 415, unsupported},
+		{"invalid type", "application/json-invalid", `{}`, 415, unsupported},
+		{"bad parameter", "application/json; charset", `{}`, 415, unsupported},
+		{"empty", "application/json", "", 400, "request body is empty"},
+		{"blank", "application/json", " \n", 400, "request body is empty"},
+		{"null", "application/json", " null\n", 400, "request body must not be null"},
+		{"syntax", "application/json", `{`, 400, "malformed JSON at offset 1"},
+		{"field type", "application/json", `{"name":42}`, 400, `invalid type for field "name"`},
+		{"body type", "application/json", `42`, 400, "invalid type for request body"},
+		{"second value", "application/json", `{} {}`, 400, "malformed JSON at offset 4"},
+		{"trailing garbage", "application/json", `{} nope`, 400, "malformed JSON at offset 4"},
+		{"too large", "application/json", `{"name":"` + strings.Repeat("a", 64) + `"}`, 413, "request body is too large"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			app := New()
 			app.SetConfig("logging:disable", "true")
+			app.SetConfig("request:max-body-size", "64")
 			called := false
 			app.Post("/", func(_ *Context, req *Request[createUser], res *Response[string]) {
 				called = true
 				res.Body = req.Body.Name
 			})
+			var decodeErr *DecodeError
+			app.Use(func(_ *Context, _ *BaseRequest, res *BaseResponse) {
+				decodeErr, _ = res.Body.(*DecodeError)
+			})
 			r := httptest.NewRequest("POST", "/", strings.NewReader(tc.body))
 			r.Header.Set("Content-Type", tc.contentType)
 			w := httptest.NewRecorder()
 			app.ServeHTTP(w, r)
-			if w.Code != tc.status || called != (tc.status == 200) {
-				t.Fatalf("status=%d called=%v", w.Code, called)
+			if w.Code != tc.status || w.Body.String() != tc.want || called != (tc.status == 200) {
+				t.Fatalf("status=%d body=%q called=%v", w.Code, w.Body.String(), called)
+			}
+			if (decodeErr != nil) != (tc.status != 200) {
+				t.Fatalf("decode error not exposed to middleware: %v", decodeErr)
+			}
+			if w.Header().Get("Content-Type") == "application/json" {
+				t.Fatal("text response labeled as JSON")
 			}
 		})
 	}
@@ -281,6 +298,9 @@ func TestRouteResponseSemantics(t *testing.T) {
 			if tc.path == "/redirect" && w.Header().Get("Location") != "/target" {
 				t.Fatal("redirect header missing")
 			}
+			if (tc.path == "/204" || tc.path == "/base-error" || tc.path == "/base-stream") && w.Header().Get("Content-Type") == "application/json" {
+				t.Fatal("non-JSON response labeled as JSON")
+			}
 		})
 	}
 }
@@ -296,14 +316,57 @@ func TestRouteRawRequestAndPointerInput(t *testing.T) {
 		res.Body = string(b)
 	})
 	app.Post("/pointer", func(_ *Context, req *Request[*createUser], res *Response[string]) { res.Body = req.Body.Name })
-	for _, tc := range []struct{ path, body, want string }{{"/raw", "not json", "not json"}, {"/pointer", `{"name":"Ada"}`, "Ada"}} {
+	for _, tc := range []struct {
+		path, body string
+		status     int
+		want       string
+	}{
+		{"/raw", "not json", 200, "not json"},
+		{"/raw", strings.Repeat("a", 2<<20), 200, strings.Repeat("a", 2<<20)},
+		{"/pointer", `{"name":"Ada"}`, 200, "Ada"},
+		{"/pointer", `null`, 400, "request body must not be null"},
+	} {
 		r := httptest.NewRequest("POST", tc.path, strings.NewReader(tc.body))
 		r.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 		app.ServeHTTP(w, r)
-		if w.Code != 200 || w.Body.String() != tc.want {
-			t.Fatalf("%s: %d %q", tc.path, w.Code, w.Body.String())
+		if w.Code != tc.status || w.Body.String() != tc.want {
+			t.Fatalf("%s: %d %.40q", tc.path, w.Code, w.Body.String())
 		}
+	}
+}
+
+func TestRouteMaxBodySize(t *testing.T) {
+	body := `{"name":"` + strings.Repeat("a", 1<<20) + `"}`
+	for _, tc := range []struct {
+		name, limit string
+		status      int
+	}{{"default", "", 413}, {"raised", "2097152", 200}, {"disabled", "0", 200}} {
+		t.Run(tc.name, func(t *testing.T) {
+			app := New()
+			app.SetConfig("logging:disable", "true")
+			if tc.limit != "" {
+				app.SetConfig("request:max-body-size", tc.limit)
+			}
+			app.Post("/", func(_ *Context, req *Request[createUser], res *Response[int]) { res.Body = len(req.Body.Name) })
+			r := httptest.NewRequest("POST", "/", strings.NewReader(body))
+			r.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
+			app.ServeHTTP(w, r)
+			if w.Code != tc.status {
+				t.Fatalf("status=%d", w.Code)
+			}
+		})
+	}
+	for _, value := range []string{"-1", "1MB", ""} {
+		func() {
+			defer func() {
+				if recover() == nil {
+					t.Errorf("expected invalid max body size %q to panic", value)
+				}
+			}()
+			New().SetConfig("request:max-body-size", value)
+		}()
 	}
 }
 

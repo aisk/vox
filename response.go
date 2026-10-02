@@ -1,6 +1,7 @@
 package vox
 
 import (
+	"io"
 	"mime"
 	"net/http"
 	"net/url"
@@ -57,9 +58,12 @@ func (response *BaseResponse) setImplicitContentType() {
 		return
 	}
 
+	if response.Status == 204 || response.Status == 304 {
+		return
+	}
+
 	switch response.Body.(type) {
-	case []byte:
-	case string:
+	case []byte, string, io.Reader, error:
 	default:
 		response.Header.Set("Content-Type", mime.TypeByExtension(".json"))
 	}
@@ -142,8 +146,8 @@ func (response *BaseResponse) setImplicitStatus() {
 }
 
 func (response *BaseResponse) setImplicit() {
-	response.setImplicitContentType()
 	response.setImplicitStatus()
+	response.setImplicitContentType()
 	response.setImplicitBody()
 }
 

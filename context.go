@@ -10,5 +10,6 @@ type Context struct {
 	App *Application
 	// Next will call the next handler / middleware to processing request.
 	// It's the middleware's responsibility to call the Next function (or not).
+	// Route handlers must not call Next; doing so panics.
 	Next func()
 }

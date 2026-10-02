@@ -23,7 +23,7 @@ func TestRequestJSONWithInvalidContentHeader(t *testing.T) {
 	r := httptest.NewRequest("POST", "http://test.com/", strings.NewReader(`{"foo": "bar"}`))
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, r)
-	if w.Result().StatusCode != 406 {
+	if w.Result().StatusCode != 415 {
 		t.Fail()
 	}
 	body, err := ioutil.ReadAll(w.Result().Body)
@@ -52,7 +52,7 @@ func TestRequestJSONWithInvalidBody(t *testing.T) {
 	r.Header.Set("content-type", "application/json; charset=utf-8")
 	w := httptest.NewRecorder()
 	app.ServeHTTP(w, r)
-	if w.Result().StatusCode != 406 {
+	if w.Result().StatusCode != 400 {
 		t.Fail()
 	}
 	body, err := ioutil.ReadAll(w.Result().Body)
