@@ -2,6 +2,7 @@ package vox
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -236,6 +237,27 @@ func TestRouteResponseSemantics(t *testing.T) {
 	})
 	app.Head("/head", func(_ *Context, _ *Request[NoBody], res *Response[string]) { res.Body = "hidden" })
 	app.Get("/204", func(_ *Context, _ *Request[NoBody], res *Response[userBody]) { res.Status = 204 })
+	app.Get("/error-status", func(_ *Context, _ *Request[NoBody], res *Response[userBody]) { res.Status = 404 })
+	app.Get("/error-message", func(_ *Context, _ *Request[NoBody], res *Response[string]) {
+		res.Status = 400
+		res.Body = "invalid id"
+	})
+	app.Get("/error-typed", func(_ *Context, _ *Request[NoBody], res *Response[userBody]) {
+		res.Status = 409
+		res.Body = userBody{1, "Ada"}
+	})
+	app.Get("/error-empty", func(_ *Context, _ *Request[NoBody], res *Response[NoBody]) { res.Status = 404 })
+	app.Get("/base-error", func(_ *Context, _ *Request[NoBody], res *Response[userBody]) {
+		res.Status = 500
+		res.BaseResponse.Body = errors.New("boom")
+	})
+	app.Get("/base-body", func(_ *Context, _ *Request[NoBody], res *Response[userBody]) {
+		res.Body = userBody{1, "Ada"}
+		res.BaseResponse.Body = "base"
+	})
+	app.Get("/base-stream", func(_ *Context, _ *Request[NoBody], res *Response[NoBody]) {
+		res.BaseResponse.Body = strings.NewReader("stream")
+	})
 	for _, tc := range []struct {
 		method, path string
 		status       int
@@ -246,6 +268,9 @@ func TestRouteResponseSemantics(t *testing.T) {
 		{"GET", "/redirect", 302, "<a href=\"/target\">Found</a>.\n"}, {"POST", "/redirect", 303, ""},
 		{"GET", "/raw", 202, "raw"}, {"HEAD", "/head", 200, ""}, {"GET", "/204", 204, ""},
 		{"GET", "/missing", 404, "Not Found"},
+		{"GET", "/error-status", 404, "Not Found"}, {"GET", "/error-message", 400, "invalid id"},
+		{"GET", "/error-typed", 409, `{"id":1,"name":"Ada"}`}, {"GET", "/error-empty", 404, ""},
+		{"GET", "/base-error", 500, "boom"}, {"GET", "/base-body", 200, "base"}, {"GET", "/base-stream", 200, "stream"},
 	} {
 		t.Run(tc.method+tc.path, func(t *testing.T) {
 			w := httptest.NewRecorder()

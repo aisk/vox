@@ -14,7 +14,15 @@ func TestNewResponse(t *testing.T) {
 	w := httptest.NewRecorder()
 	response := createResponse(w)
 	response.setImplicit()
-	if response.Status != 404 {
+	if response.Status != 404 || response.Body != "Not Found" {
+		t.Fail()
+	}
+
+	w = httptest.NewRecorder()
+	response = createResponse(w)
+	response.Status = 403
+	response.setImplicit()
+	if response.Body != "Forbidden" {
 		t.Fail()
 	}
 

@@ -5,6 +5,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"reflect"
 	"strings"
 )
 
@@ -69,7 +70,8 @@ func (app *Application) Route[In, Out any](method, path string, handler RouteHan
 			panic("vox: Context.Next is only available in middleware; return from a route handler instead")
 		}
 		handler(ctx, request, response)
-		if res.DontRespond || res.redirected {
+		// A body written to BaseResponse directly (error, stream) takes precedence.
+		if res.DontRespond || res.redirected || res.HasBody() {
 			return
 		}
 		if _, empty := any(response.Body).(NoBody); empty {
@@ -77,9 +79,13 @@ func (app *Application) Route[In, Out any](method, path string, handler RouteHan
 			if res.Status == 0 {
 				res.Status = http.StatusNoContent
 			}
-		} else {
-			res.Body = response.Body
+			return
 		}
+		// An error status with an untouched body falls back to the status text.
+		if res.Status >= http.StatusBadRequest && reflect.ValueOf(&response.Body).Elem().IsZero() {
+			return
+		}
+		res.Body = response.Body
 	})
 }
 
